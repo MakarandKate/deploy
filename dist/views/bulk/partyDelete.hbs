@@ -1,0 +1,83 @@
+<input type="hidden" id="inp-userId" value="{{data.userId}}"/>
+<input type="hidden" id="inp-profileId" value="{{data.profileId}}"/>
+<div class="container">
+    <h1>Party Bulk Delete</h1>
+    <hr/>
+    <p>Select parties to delete and click on delete button</p>
+    <button class="btn btn-danger" style="float:right" id="btn-party-delete">Delete</button>
+    <table class="table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="inp-selectAll"/></th>
+                <th>Party Name</th>
+                <th>Party Phone</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each data.parties}}
+            <tr>
+                <td>
+                    <input class="inp-cb" type="checkbox" data-id="{{this._localUUID}}"/>
+
+                </td>
+                <td>{{this.name}}</td>
+                <td>{{this.phone}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+    onLoad(()=>{
+        $("#inp-selectAll").on('click',()=>{
+            let isChecked=$("#inp-selectAll")[0].checked;
+            if(isChecked){
+                $(".inp-cb").each((i,el)=>{
+                    $(el)[0].checked=true;
+                })
+            }else{
+                $(".inp-cb").each((i,el)=>{
+                    $(el)[0].checked=false;
+                })
+            }
+        })
+
+        $(".inp-cb").on("click", (event)=>{
+            if($(".inp-cb:checked").length === $(".inp-cb").length) {
+                $("#inp-selectAll").prop('checked',true);
+            } else {
+                $("#inp-selectAll").prop('checked',false);
+            }
+        })
+
+        $("#btn-party-delete").on('click',()=>{
+            let selectedParties=[];
+            $(".inp-cb").each((i,el)=>{
+                if($(el)[0].checked){
+                    selectedParties.push($(el).data("id"));
+                }
+            })
+
+            let cnf=confirm(`Are you sure you want to delete ${selectedParties.length} parties?`);
+            if(cnf){
+                $.ajax({
+                    type:"POST",
+                    url:`${_HOST}/bulk/party/delete`,
+                    data:{
+                        selectedParties,
+                        userId:$("#inp-userId").val(),
+                        profileId:$("#inp-profileId").val()
+                    },
+                    success:(res)=>{
+                        if(res.status=="success"){
+                            alert("Parties deleted");
+                            window.location=window.location.href;
+                        }
+                    }
+                })
+            }
+        });
+    })
+</script>

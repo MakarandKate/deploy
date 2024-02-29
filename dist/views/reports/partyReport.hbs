@@ -1,0 +1,444 @@
+<style>
+    .blur-text {
+    color: transparent !important;
+    text-shadow: 0 0 4px #34A853;
+  }
+
+  .header-wrapper {
+    padding: 10px;
+    background: #eaf2fe;
+    border-radius: 6px;
+    text-align: center;
+    color: #006fee;
+    margin-bottom: 15px;
+  }
+
+  .closebtn {
+    margin-left: 15px;
+    color: #46763d;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .business-logo img {
+    width: 80px;
+    height: 80px;
+    border-radius: 5px;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .alert {
+    transition: 0.5s ease-out;
+    position: fixed;
+    width: 85%;
+    bottom: 50px;
+    color: green;
+    background: #f9fff2;
+  }
+
+  .snackbar-holder {
+    position: fixed;
+    bottom: -300px;
+    left: 0px;
+    min-height: 30px;
+    max-height: 100px;
+    z-index: 99999;
+    width: 100%;
+    padding: 20px;
+    opacity: 0;
+    transition: 0s all linear;
+    color: #46763d;
+  }
+
+  .background-gradient {
+    display: flow-root;
+    min-height: 100vh;
+    background: linear-gradient(to right, #3518ae, #3026b8, #2b33c1, #233ecb, #1948d4, #1250da, #0958e0, #0060e6, #0067ea, #006fee, #0076f2, #007df6);
+  }
+
+  .card-wrapper {
+    padding: 15px;
+    background: #fff;
+    margin: 10px;
+    border-radius: 10px;
+    border: 0.5px solid #e3f1fe4f;
+    box-shadow: 0 3px 4px 1px #007df614;
+  }
+
+  .flex {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-flow: wrap;
+  }
+
+  .flex.space-b {
+    justify-content: space-between;
+  }
+
+  .flex.d-col {
+    flex-direction: column;
+    justify-content: center;
+    margin: 8px -15px;
+    width: calc(100% + 30px);
+    background: #EAF2FE;
+    padding: 5px 0;
+  }
+
+  .d-col span {
+    color: grey;
+  }
+
+  .amt {
+    font-size: 18px;
+    margin-top: 3px;
+    color: #34A853;
+  }
+
+  .btn {
+    margin: 10px 0 0;
+    padding: 15px;
+    width: 256px;
+    box-shadow: 0 3px 4px 1px #007df614;
+  }
+
+  .btn-primary.btn-sm,
+  .btn-primary.btn-sm:hover,
+  .btn-primary.btn-sm:focus {
+    background: #4285F4;
+    border-color: #4285F4;
+  }
+
+  .btn-success.btn-sm,
+  .btn-success.btn-sm:hover,
+  .btn-success.btn-sm:focus {
+    background: #34A853;
+    border-color: #34A853;
+  }
+
+  .margin-bottom10 {
+    margin-bottom: 10px;
+  }
+
+  p {
+    margin: 0 0 0px;
+  }
+
+  .date {
+    font-size: 12px;
+  }
+
+
+  .closebtn {
+    margin-left: 15px;
+    color: #46763d;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  .alert {
+    transition: 0.5s ease-out;
+    position: fixed;
+    width: 85%;
+    bottom: 50px;
+    color: green;
+    background: #f9fff2;
+  }
+
+  .blue-color p {
+    color: #00257E;
+  }
+
+  .snackbar-holder {
+    position: fixed;
+    bottom: -300px;
+    left: 0px;
+    min-height: 30px;
+    max-height: 100px;
+    z-index: 99999;
+    width: 100%;
+    padding: 20px;
+    opacity: 0;
+    transition: 0s all linear;
+    color: #46763d;
+  }
+
+  .font-size20 {
+    font-size: 20px;
+  }
+
+  .business-logo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center !important;
+  }
+
+  .business-logo p {
+    color: #5B5D5C;
+    margin-top: 4px;
+    font-size: 17px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .font-size18 {
+    font-size: 18px;
+  }
+
+  p.ez-name {
+    font-size: 24px;
+    color: white;
+    text-align: center;
+    margin: 20px 0px;
+  }
+
+  .r-c {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-items: center;
+    width: 100%;
+    padding: 8px 15px;
+  }
+
+  .r-c p.info {
+    width: 100%;
+    font-size: 12px;
+  }
+
+  .ezo-circle-btn-section {
+    width: 100%;
+    border: 0.5px solid #e3f1fe4f;
+    box-shadow: 0 2px 4px 1px #007df617;
+    background: #fff;
+    padding: 15px 10px 5px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .ezo-circle-btn-section img {
+    width: 100%;
+    display: block;
+    margin: auto;
+  }
+
+  .img-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    margin: auto;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ezo-circle-btn-section p {
+    font-size: 13px;
+    color: #007bf5;
+    text-align: center;
+    min-height: 36px;
+    overflow: hidden;
+    margin: 10px 0 5px;
+
+  }
+
+  .img-icon.upi {
+    width: 50px;
+    margin: 0;
+  }
+
+  .fr {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .fr .col-xs-4 {
+    padding: 0 5px;
+    width: 100%;
+  }
+
+  .w-100 .ezo-circle-btn-section {
+    color: #34A853;
+    border: 2px solid #34A853;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .w-100 .ezo-circle-btn-section p {
+    min-height: 16px;
+    margin: 0;
+    color: #34A853;
+  }
+
+  .col-xs-4.down-size {
+    width: 24.33%;
+  }
+
+  .col-xs-4.down-size .ezo-circle-btn-section p {
+    font-size: 10px;
+    color: #007bf5;
+    text-align: center;
+    min-height: 30px;
+    overflow: hidden;
+    margin: 10px 0 5px;
+  }
+
+  @media (min-width: 992px) {
+    .btn {
+      margin: 10px 1% 0;
+      width: max-content;
+      float: left;
+    }
+
+    .card-wrapper {
+      display: flow-root;
+      padding: 12px 35px;
+    }
+  }
+
+  .main-table {
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .main-table td,
+  .main-table th {
+    background-color: #FFFFFF;
+    border: 1px solid #ddd;
+    padding: 8px;
+  }
+
+  .main-table tr:nth-child(even) {
+    background-color: #F5F5F5;
+  }
+
+  .main-table tr:hover {
+    background-color: #F5F5F5;
+  }
+
+  .main-table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: left;
+    background-color: #3E80ED;
+    color: black;
+  }
+
+  @media print {
+    .print-none {
+      display: none;
+    }
+  }
+</style>
+
+<div class="container">
+    <div class="card-wrapper">
+        <div class="business-logo">
+            <img src="{{data.profile.logoLink}}">
+            <p>{{ data.profile.legalName }}</p>
+        </div>
+        <p class="header-wrapper">Party Statement Report</p>
+
+        <div class="blue-color">
+            <p>To</p>
+            <p class="margin-bottom10 font-size18">{{ data.partyReportData.party.name }}</p>
+        </div>
+        <div class="center1">
+            <div class="flex space-b">
+                <span>Start Date <br>{{ data.partyReportData.startTime }}</span>
+                <span>End Date <br>{{ data.partyReportData.endTime }}</span>
+            </div>
+            <div class="flex d-col">
+                <div class="r-c">
+                    <span>Total Sale Amount</span>
+                    <p class="amt"> &#8377; {{ data.partyReportData.totalSalesAmount }}</p>
+                </div>
+                <div class="r-c">
+                    <span>Total Purchase Amount</span>
+                    <p class="amt"> &#8377; {{ data.partyReportData.totalPurchasesAmount }}</p>
+                </div>
+                <div class="r-c">
+                    <span>Total Money In Amount</span>
+                    <p class="amt"> &#8377; {{ data.partyReportData.totalMoneyInsAmount }}</p>
+                </div>
+                <div class="r-c">
+                    <span>Total Money Out Amount</span>
+                    <p class="amt"> &#8377; {{ data.partyReportData.totalMoneyOutsAmount }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h1 style="color: white;">Party Statement Report</h1>
+        <table class="main-table" width="100%">
+            <thead>
+                <th>Date</th>
+                <th>TXN Type</th>
+                <th>Invoice/Bill</th>
+                <th>Credit</th>
+                <th>Debit</th>
+            </thead>
+            <tbody>
+                {{#each data.partyReportData.records}}
+                    <tr>
+                        <td>{{ dateToDDMMYYY this.record.billDateStamp }}</td>
+                        <td>{{ this.txnType }}</td>
+                        <td>{{ this.record.billNo }}</td>
+                        {{#if isPurchaseMoneyIn this.txnType}}
+                            <td>{{ this.record.totalAmount }}</td>
+                        {{else}}
+                            0
+                        {{/if}}
+                        
+                        {{#if isSaleMoneyOut this.txnType}}
+                            <td>{{ this.record.totalAmount }}</td>
+                        {{else}}
+                            0
+                        {{/if}}
+                    </tr>
+                    <tr *ngIf="record?.record?.billItems?.length">
+                        <td width="10%"></td>
+                        <td width="90%" colspan="4">
+                            <table class="sub-table" width="100%">
+                                <thead>
+                                    <th>#</th>
+                                    <th>Item Name</th>
+                                    <th>Qty</th>
+                                    <th>Unit</th>
+                                    <th>Rs/Unit</th>
+                                    <th>Amount</th>
+                                </thead>
+                                <tbody>
+                                    {{#each this.record.billItems}}
+                                        <tr>
+                                            <td>{{ inc @index }}</td>
+                                            <td>{{ this.item.itemName }}</td>
+                                            <td>{{ this.quantity }}</td>
+                                            <td>{{ this.unit }}</td>
+                                            <td>{{ this.price }}</td>
+                                            <td>{{ this.total }}</td>
+                                        </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>

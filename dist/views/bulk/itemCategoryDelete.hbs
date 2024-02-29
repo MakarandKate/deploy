@@ -1,0 +1,81 @@
+<input type="hidden" id="inp-userId" value="{{data.userId}}"/>
+<input type="hidden" id="inp-profileId" value="{{data.profileId}}"/>
+<div class="container">
+    <h1>Item Category Bulk Delete</h1>
+    <hr/>
+    <p>Select item categories to delete and click on delete button</p>
+    <button class="btn btn-danger" style="float:right" id="btn-delete">Delete</button>
+    <table class="table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="inp-selectAll"/></th>
+                <th>Category Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each data.itemCategories}}
+            <tr>
+                <td>
+                    <input class="inp-cb" type="checkbox" data-id="{{this._localUUID}}"/>
+
+                </td>
+                <td>{{this.name}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+    onLoad(()=>{
+        $("#inp-selectAll").on('click',()=>{
+            let isChecked=$("#inp-selectAll")[0].checked;
+            if(isChecked){
+                $(".inp-cb").each((i,el)=>{
+                    $(el)[0].checked=true;
+                })
+            }else{
+                $(".inp-cb").each((i,el)=>{
+                    $(el)[0].checked=false;
+                })
+            }
+        })
+
+        $(".inp-cb").on("click", (event)=>{
+            if($(".inp-cb:checked").length === $(".inp-cb").length) {
+                $("#inp-selectAll").prop('checked',true);
+            } else {
+                $("#inp-selectAll").prop('checked',false);
+            }
+        })
+
+        $("#btn-delete").on('click',()=>{
+            let selectedItems=[];
+            $(".inp-cb").each((i,el)=>{
+                if($(el)[0].checked){
+                    selectedItems.push($(el).data("id"));
+                }
+            })
+
+            let cnf=confirm(`Are you sure you want to delete ${selectedItems.length} item categories?`);
+            if(cnf){
+                $.ajax({
+                    type:"POST",
+                    url:`${_HOST}/bulk/deleteItemCategories`,
+                    data:{
+                        selectedItems,
+                        userId:$("#inp-userId").val(),
+                        profileId:$("#inp-profileId").val()
+                    },
+                    success:(res)=>{
+                        if(res.status=="success"){
+                            alert("Item categories deleted");
+                            window.location=window.location.href;
+                        }
+                    }
+                })
+            }
+        });
+    })
+</script>

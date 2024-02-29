@@ -1,0 +1,97 @@
+<style>
+
+    .container {
+        margin-bottom: 500px;
+    }
+
+    #inp-phone {
+        padding: 5px;
+        text-align: center;
+    }
+
+    #btn-fetch-otp {
+        margin-left: 20px;
+    }
+
+    #no-otp {
+        display: none;
+        color: red;
+        margin-top: 15px;
+    }
+
+    #span-otp {
+        display: none;
+        color: blue;
+        font-size: 25px;
+        margin-top: 15px;
+    }
+
+    .message-container {
+        text-align: center;
+    }
+
+</style>
+
+<div class="container">
+    <div class="row" style="margin-top: 20%;">
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4" style="display: flex;">
+            <input id="inp-phone" placeholder="Phone">
+            <button class="btn btn-primary" type="button" id="btn-fetch-otp" onclick="fetchOtp()">Fetch OTP</button>
+        </div>
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4 message-container">
+            <span id="span-otp"></span>
+            <span id="no-otp">
+                There is no OTP Found.
+            </span>
+        </div>
+        <div class="col-lg-4"></div>
+    </div>
+</div>
+
+<script>
+    onLoad(()=>{
+        let link=window.location.href;
+        if(link.indexOf("https://db.ezobooks.in/")!=-1){
+            link=link.replace(/https:\/\/db.ezobooks.in/g,'https://devdb.ezobooks.in');
+            window.location=link;
+        }
+    });
+</script>
+<script>
+
+    function fetchOtp() {
+        let phone = $("#inp-phone").val();
+        if(phone?.length === 10) {
+            $.ajax({
+                type: "POST",
+                url: `${_HOST}/api/user/fetchOtp`,
+                data: {
+                    phone,
+                },
+                success: (res) => {
+                    if(res?.otp) {
+                        $("#span-otp").text(res?.otp);
+                        $('#span-otp').css("display","block");
+                        $('#no-otp').css("display","none");
+                    }else {
+                        $('#no-otp').css("display","block");
+                        $('#span-otp').css("display","none");
+                    }
+                },
+                error: () => {}
+            });
+        }
+    }
+
+    function excelUpload() {
+        let phone = $("#inp-phone").val();
+        let profileId = $('#select-profile').val();
+        if(phone?.length === 10 && profileId) {
+            window.location.href = `${_HOST}/excel/upload?userId=${phone}&profileId=${profileId}`;
+        }
+    }
+
+</script>

@@ -1,0 +1,145 @@
+<style>
+    .image-div {
+        display: block;
+        width: 100%;
+        text-align: center;
+    }
+    #img-loader {
+        display: none;
+        width: 100px;
+    }
+</style>
+<div>
+    <span class="image-div">
+        <img id="img-loader" src="{{HOST}}/svg/spin.svg" alt="Loading"/>
+    </span>
+    <div class="modal-dialog modal-lg" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Activate Premium</h5>
+            </div>
+            <form id="ezo-activate-premium-form" class="needs-validation" novalidate>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="inp-premium-phone-number">Phone number</label>
+                                <input type="text" class="form-control" id="inp-premium-phone-number" placeholder="Phone" pattern="^[56789][0-9]{9}$" required>
+                                <div class="valid-feedback"></div>
+                                <div class="invalid-feedback">Phone is invalid!</div>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="inp-premium-validity">Choose Validity</label>
+                                <select class="form-control" name="validity" id="inp-premium-validity" required>
+                                    <option value="12">12 months</option>
+                                    <option value="13">13 months</option>
+                                    <option value="14">14 months</option>
+                                    <option value="15">15 months</option>
+                                    <option value="16">16 months</option>
+                                    <option value="17">17 months</option>
+                                    <option value="18">18 months</option>
+                                    <option value="19">19 months</option>
+                                    <option value="20">20 months</option>
+                                    <option value="21">21 months</option>
+                                    <option value="22">22 months</option>
+                                    <option value="23">23 months</option>
+                                    <option value="24">24 months</option>
+                                    <option value="lifetime">Lifetime</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="inp-premium-valid-till">Valid till:</label>
+                                <input type="date" id="inp-premium-valid-till">
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="inp-premium-plan">Choose plan</label>
+                                <select class="form-control" name="plan" id="inp-premium-plan" required>
+                                    <option value="gold">Gold</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" id="btn-premium-submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    onLoad((_w, _c) => {
+
+        $("#inp-premium-validity").on("change", (e) => {
+            let selectedValidity = $("#inp-premium-validity").val();
+            let currentDate = new Date();
+            if (selectedValidity === "lifetime") {
+                currentDate.setMonth(currentDate.getMonth() + parseInt(120));
+                $('#inp-premium-valid-till').val(convertTimestampToHtmlDateFormate(currentDate));
+            } else {
+                currentDate.setMonth(currentDate.getMonth() + parseInt(selectedValidity));
+                $('#inp-premium-valid-till').val(convertTimestampToHtmlDateFormate(currentDate));
+            }
+        });
+
+        $("#btn-premium-submit").on("click",(e)=>{
+            e.preventDefault();
+
+            $("#btn-premium-submit").css("display","none");
+            let $form = $("#ezo-activate-premium-form");
+
+            if($form.hasClass('invalid')) {
+                $("#btn-premium-submit").css("display","block");
+                return null;
+            } 
+            
+            let phone = ($("#inp-premium-phone-number").val() || '').trim().replace(/\D/g,'').slice(-10);
+            let proExpiryStamp = +new Date($("#inp-premium-valid-till").val());
+            let plan = $("#inpPlan").val();
+
+            $("#img-loader").show();
+            $.ajax({
+                type: "POST",
+                url: `${_HOST}/premium/activate`,
+                data: {
+                    phone,
+                    proExpiryStamp,
+                    plan
+                },
+                success: (res) => {
+                    if(res.status=="success"){
+                        $("#img-loader").hide();
+                        alert("Premium Activated successfully!");
+                        window?.location?.reload();
+                    }
+                    else if (res.status=="failed"){
+                        $("#img-loader").hide();
+                        alert("Failed to Activate Premium !");
+                        $("#btn-premium-submit").css("display","block");
+                    }
+                },
+                error: (error) => {
+                    $("#img-loader").hide();
+                    alert("Failed to Activate Premium !");
+                    $("#btn-premium-submit").css("display","block");
+                }
+            });
+        });
+    });
+
+    function convertTimestampToHtmlDateFormate(timeStamp) {
+        const dt = new Date(timeStamp);
+        const year = dt.getFullYear();
+        const month = ("0" + (dt.getMonth() + 1)).slice(-2);
+        const day = ("0" + dt.getDate()).slice(-2);
+        return `${year}-${month}-${day}`;
+    }
+</script>

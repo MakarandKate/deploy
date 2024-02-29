@@ -1,0 +1,212 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<div class="container-fluid">
+    
+<h1>Sale</h1>
+<hr/>
+<div class="row">
+    <div class="col-sm-6">
+        <h3>Total Sale Today: {{data.todayCount}}</h3>
+        <h3>Total Sale TillDate: {{data.totalCount}}</h3>
+        <h3>Total Registration Today : {{data.totalRegistrationDay0}}</h3>
+    </div>
+    <div class="col-sm-6">
+        <h3>Current Active Users: {{data.currentActiveUsersCount}}</h3>
+        <h3>Current Paid Active Users: {{data.paidActiveUsersCount}}</h3>
+        <h3>Current Pro Active Users: {{data.proActiveUsersCount}}</h3>
+        <h3>Total Paid User : {{data.totalPaidUsers}}</h3>
+        <h3>Total Pro User : {{data.totalProUsers}}</h3>
+
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <div id="chart_div" style="width:100%"></div>
+    </div>
+    <div class="col-sm-12">
+        <div id="registration_chart" style="width: 100%;"></div>
+    </div>
+    <div class="col-sm-12">
+        <div id="activeusers_chart" style="width: 100%;"></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <div id="map_div" style="width: 100%;"></div>
+    </div>
+    {{!-- <div class="col-sm-12">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Top Users</h3>
+                
+            </div>
+            <div class="col-sm-4">
+                <h5>All Time</h5>
+                <hr/>
+                <ol>
+                    {{#each data.topUsersAllTime}}
+                        <li>
+                            {{this._id.userId}} ({{this.count}})
+                        </li>
+                    {{/each}}
+                </ol>
+            </div>
+            <div class="col-sm-4">
+                <h5>Today</h5>
+                <hr/>
+                <ol>
+                    {{#each data.topUsersToday}}
+                        <li>
+                            {{this._id.userId}} ({{this.count}})
+                        </li>
+                    {{/each}}
+                </ol>
+            </div>
+            <div class="col-sm-4">
+                <h5>Last Hour</h5>
+                <hr/>
+                <ol>
+                    {{#each data.topUsersLastHour}}
+                        <li>
+                            {{this._id.userId}} ({{this.count}})
+                        </li>
+                    {{/each}}
+                </ol>
+            </div>
+        </div>
+    </div> --}}
+</div>
+</div>
+<script>
+    onLoad(()=>{
+        google.charts.load('current', {
+            'packages':['corechart','geochart'],
+            'mapsApiKey':'AIzaSyDS3O3U7T0G8uhfy2n4hx3hgRk23rDcfkI'
+        });
+        google.charts.setOnLoadCallback(drawChart);
+    })
+
+    function drawChart() {
+
+        // Create the data table.
+        var data = new google.visualization.arrayToDataTable([
+            ['Hours', 'Count', { role: 'annotation' }],
+            ['Hour 24', {{data.hour24Count}}, {{data.hour24Count}}],
+            ['Hour 23', {{data.hour23Count}}, {{data.hour23Count}}],
+            ['Hour 22', {{data.hour22Count}}, {{data.hour22Count}}],
+            ['Hour 21', {{data.hour21Count}}, {{data.hour21Count}}],
+            ['Hour 20', {{data.hour20Count}}, {{data.hour20Count}}],
+            ['Hour 19', {{data.hour19Count}}, {{data.hour19Count}}],
+            ['Hour 18', {{data.hour18Count}}, {{data.hour18Count}}],
+            ['Hour 17', {{data.hour17Count}}, {{data.hour17Count}}],
+            ['Hour 16', {{data.hour16Count}}, {{data.hour16Count}}],
+            ['Hour 15', {{data.hour15Count}}, {{data.hour15Count}}],
+            ['Hour 14', {{data.hour14Count}}, {{data.hour14Count}}],
+            ['Hour 13', {{data.hour13Count}}, {{data.hour13Count}}],
+            ['Hour 12', {{data.hour12Count}}, {{data.hour12Count}}],
+            ['Hour 11', {{data.hour11Count}}, {{data.hour11Count}}],
+            ['Hour 10', {{data.hour10Count}}, {{data.hour10Count}}],
+            ['Hour 9', {{data.hour9Count}}, {{data.hour9Count}}],
+            ['Hour 8', {{data.hour8Count}}, {{data.hour8Count}}],
+            ['Hour 7', {{data.hour7Count}}, {{data.hour7Count}}],
+            ['Hour 6', {{data.hour6Count}}, {{data.hour6Count}}],
+            ['Hour 5', {{data.hour5Count}}, {{data.hour5Count}}],
+            ['Hour 4', {{data.hour4Count}}, {{data.hour4Count}}],
+            ['Hour 3', {{data.hour3Count}}, {{data.hour3Count}}],
+            ['Hour 2', {{data.hour2Count}}, {{data.hour2Count}}],
+            ['Hour 1', {{data.hour1Count}}, {{data.hour1Count}}],
+            ['Hour 0', {{data.hour0Count}}, {{data.hour0Count}}],
+        ]);
+
+        // Set chart options
+        var options = {
+        title: 'Total Sale hourwise',
+        hAxis: {
+          title: 'Hour',
+
+        },
+        vAxis: {
+          title: 'Sales Count'
+        },
+        width:1000
+      };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+        drawMap();
+      }
+
+ 
+    
+    function drawMap () {
+      var data = new google.visualization.arrayToDataTable({{{data.mapPins}}});
+
+
+      var options = {
+        region: 'IN',
+        displayMode: 'markers',
+        colorAxis: {colors: ['blue']},
+        width:2500,
+        height:2500
+      };
+
+      var mapChart = new google.visualization.GeoChart(document.getElementById('map_div'));
+      mapChart.draw(data, options);
+      drawRegistrationChart();
+    }
+
+    function drawRegistrationChart() {
+
+        // Create the data table.
+        var data = new google.visualization.arrayToDataTable([
+            ['Days', 'Count'],
+            ['Day6',{{data.totalRegistrationDay6}}],
+            ['Day5',{{data.totalRegistrationDay5}}],
+            ['Day4',{{data.totalRegistrationDay4}}],
+            ['Day3',{{data.totalRegistrationDay3}}],
+            ['Day2',{{data.totalRegistrationDay2}}],
+            ['Day1',{{data.totalRegistrationDay1}}],
+            ['Day0',{{data.totalRegistrationDay0}}],
+        ]);
+
+        // Set chart options
+        var options = {
+          title: 'Registration',
+          legend: { position: 'bottom' },
+          width:1000
+        };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.LineChart(document.getElementById('registration_chart'));
+        chart.draw(data, options);
+        drawActiveUsersChart();
+      }
+
+      function drawActiveUsersChart() {
+
+        // Create the data table.
+        var data = new google.visualization.arrayToDataTable([
+            ['Days', 'Count'],
+            ['Week7',{{data.week7ActiveUsers}}],
+            ['Week6',{{data.week6ActiveUsers}}],
+            ['Week5',{{data.week5ActiveUsers}}],
+            ['Week4',{{data.week4ActiveUsers}}],
+            ['Week3',{{data.week3ActiveUsers}}],
+            ['Week2',{{data.week2ActiveUsers}}],
+            ['Week1',{{data.week1ActiveUsers}}],
+            ['Day1',{{data.day1ActiveUsers}}],
+            ['Day0',{{data.day0ActiveUsers}}],
+        ]);
+
+        // Set chart options
+        var options = {
+          title: 'Active Users',
+          legend: { position: 'bottom' },
+          width:1000
+        };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.LineChart(document.getElementById('activeusers_chart'));
+        chart.draw(data, options);
+      }
+</script>

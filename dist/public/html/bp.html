@@ -1,0 +1,210 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <script src="https://code.jquery.com/jquery-3.7.0.slim.min.js" integrity="sha256-tG5mcZUtJsZvyKAxYLVXrmjKBVLd6VpVccqz/r4ypFE=" crossorigin="anonymous"></script>
+        <script src="../js/barcode.js"></script>
+    </head>
+    <style>
+        *{
+            padding:0;
+            margin:0;
+        }
+        #bp-canvas{
+            padding:20px;
+            background: #ccc;
+            width:100%;
+            height:auto
+        }
+        #bp-page{
+            margin: auto;
+            width: 210mm;
+            height: 297mm;
+            background: #fff;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .bp-sticker-barcode-area{
+            width:100%;
+            min-height: 5mm;
+            position: absolute;
+            bottom: 0;
+            right:0;
+            overflow: hidden;
+        }
+
+        .bp-barcode-text{
+            position: absolute;
+            bottom: 0;
+            text-align: center;
+            right: 0;
+            width:100%;
+            font-size: 2.5mm;
+            background-color: #fff;
+            display: block;
+
+        }
+        .bp-sticker-text{
+            text-align: center;
+            position: absolute;
+
+        }
+        .bp-sticker-text p{
+            font-size: 3mm;
+            width:100%;
+            text-align: center;
+        }
+        .bp-generated-barcode-holder{
+            position: relative;
+            top:-20mm
+        }
+        @media print{
+            #forms{
+                display: none;
+            }
+            body{
+                height:297mm;
+                width:210mm;
+            }
+            #bp-canvas{
+                padding: 0;
+                margin:0;
+            }
+        }
+    </style>
+    <body>
+        <div id="forms">
+
+            Columns
+            <input type="number" id="inp-col" value="4"/>
+            Rows
+            <input type="number" id="inp-row" value="10"/>
+            <hr/>
+            Brand Name
+            <input type="text" id="inp-brand" value="Brand Name "/>
+            Item Name
+            <input type="text" id="inp-name" value="Item Name "/>
+            <hr/>
+            Sell Price
+            <input type="number" id="inp-sp" value="38.99"/>
+            Mrp
+            <input type="number" id="inp-mrp" value="50"/>
+            <hr/>
+            Skip
+            <input type="number" id="inp-skip" value="7"/>
+    
+            <button id="btn-generate">Generate</button>
+            <button id="btn-print">Print</button>
+            <img id="barcode"/>
+        </div>
+        <div id="bp-canvas">
+            <div id="bp-page">
+            </div>
+        </div>
+    </body>
+    <script>
+        let pageWidth=210;
+        let pageHeight=297;
+        
+
+        function generateGridArea(noOfColumns,noOfRows){
+            $("#bp-page").html('')
+            let skipIndex=Number($("#inp-skip").val());
+            let cellWidth=Math.floor((pageWidth/noOfColumns)*100)/100;
+            let cellHeight=Math.floor((pageHeight/noOfRows)*100)/100;
+            for(let i=0;i<noOfRows;i++){
+                for(let j=0;j<noOfColumns;j++){
+                    let stickerIndex=(i*noOfColumns)+j+1;
+                    if(stickerIndex<=skipIndex){
+                        continue;
+                    }
+                    let cellDiv=document.createElement('div')
+                    cellDiv.innerHTML=generateStickerPrint(stickerIndex);
+                    cellDiv.style.textAlign='center';
+                    cellDiv.style.width=cellWidth+'mm';
+                    cellDiv.style.height=cellHeight+'mm';
+                    cellDiv.style.position='absolute';
+                    cellDiv.style.top=i*cellHeight+'mm';
+                    cellDiv.style.left=j*cellWidth+'mm';
+                    cellDiv.style.overflow="hidden";
+                    $("#bp-page").append($(cellDiv))
+                }
+            }
+            let barcodeHeight=(Math.floor((1*cellHeight/3)*100)/100)+'mm';
+            $(".bp-sticker-barcode-area").css('height',barcodeHeight);
+            $(".bp-sticker-text").css({
+                bottom:barcodeHeight,
+                left:0,
+                width:'100%'
+            })
+            $(".bp-sticker-print").css({
+                width:(cellWidth-5)+'mm',
+                height:(cellHeight-5)+'mm',
+                position:'absolute',
+                top:'2.5mm',
+                left:'2.5mm',
+                overflow:'hidden'
+            })
+
+            setTimeout(()=>{
+                // $(".bp-sticker-print").each((i,el)=>{
+                //     let holder=$(el).find('.bp-generated-barcode-holder')[0];
+                //     let text=$(el).find(".bp-barcode-text").text();
+                //     JsBarcode(holder).init();
+                //     $(holder).JsBarcode(text);
+                //         // JsBarcode(holder, "1234", {
+                //         //     format: "pharmacode",
+                //         //     lineColor: "#0aa",
+                //         //     width:4,
+                //         //     height:40,
+                //         //     displayValue: true
+                //         // });
+                // });
+                JsBarcode(".bp-generated-barcode-holder").init();
+                //JsBarcode("#barcode", "Hi!");
+            },1000);
+        }
+
+        function generateStickerPrint(stickerIndex){
+            let brandName=$("#inp-brand").val();
+            let itemName=$("#inp-name").val();
+            let sp=$("#inp-sp").val()+'';
+            let mrp=$("#inp-mrp").val()+'';
+            let priceText='';
+            if(sp && sp.length>0){
+                priceText+='SP: '+sp
+            }
+            if(mrp && mrp.length>0){
+                if(priceText.length>0){
+                    priceText+=' | '
+                }
+                priceText+='MRP: '+mrp
+            }
+            return `
+                <div class='bp-sticker-print'>
+                    <div class="bp-sticker-text">
+                        <p>${brandName}</p>
+                        <p>${itemName}</p>
+                        <p> ${ priceText } </p>
+                    </div>
+                    <div class='bp-sticker-barcode-area'>
+                        <image class="bp-generated-barcode-holder" id="bp-generated-barcode-holder-${stickerIndex}" jsbarcode-value="1234${stickerIndex}">
+                            
+                        </image>
+                        <div class="bp-barcode-text">1234${stickerIndex}</div>
+                    </div>
+                </div>`
+        }
+
+        $(window).on('load',()=>{
+            $("#btn-generate").on('click',()=>{
+                let noOfColumns=Number($("#inp-col").val());
+                let noOfRows=Number($("#inp-row").val());
+                generateGridArea(noOfColumns,noOfRows);
+            })
+            $("#btn-print").on('click',()=>{
+                window.print();
+            })
+        })
+    </script>
+</html>

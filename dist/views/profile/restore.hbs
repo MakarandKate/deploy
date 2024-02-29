@@ -1,0 +1,73 @@
+<input type="hidden" id="inp-userId" value="{{data.userId}}"/>
+<div class="container">
+    <h1>Restore Profile</h1>
+    <hr/>
+    <p>Select profile to restore and click on restore button</p>
+    <button class="btn btn-danger" style="float:right" id="btn-restore">Restore Profile</button>
+    <table class="table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="inp-selectAll"/></th>
+                <th>Profile Name</th>
+                <th>Profile Id</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each data.deletedProfiles}}
+            <tr>
+                <td>
+                    <input class="inp-cb" type="checkbox" data-localUUID="{{this._localUUID}}"/>
+
+                </td>
+                <td>{{this.profileName}}</td>
+                <td>{{this._localUUID?.substr(-4)}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+    onLoad(()=>{
+        $("#inp-selectAll").on('click',()=>{
+            let isChecked=$("#inp-selectAll")[0].checked;
+            if(isChecked){
+                $(".inp-cb").each((i,el)=>{
+                    $(el)[0].checked=true;
+                })
+            }else{
+                $(".inp-cb").each((i,el)=>{
+                    $(el)[0].checked=false;
+                })
+            }
+        })
+
+        $("#btn-restore").on('click',()=>{
+            let selectedProfiles=[];
+            $(".inp-cb").each((i,el)=>{
+                if($(el)[0].checked){
+                    selectedProfiles.push($(el).data("localUUID"));
+                }
+            })
+
+            let cnf=confirm(`Are you sure you want to restore ${selectedProfiles.length} profile?`);
+            if(cnf){
+                $.ajax({
+                    type:"POST",
+                    url:`${_HOST}/profile/restore`,
+                    data:{
+                        selectedProfiles,
+                        userId:$("#inp-userId").val(),
+                    },
+                    success:(res)=>{
+                        if(res.status=="success"){
+                            alert("Profiles restored");
+                            window.location=window.location.href;
+                        }
+                    }
+                })
+            }
+        });
+    })
+</script>

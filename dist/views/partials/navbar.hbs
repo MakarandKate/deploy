@@ -1,0 +1,172 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Admin</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+    
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="{{HOST}}/admin">Home <span class="sr-only">(current)</span></a>
+      </li>
+      {{#if user.id}}
+      <input type="hidden" id="_inp_hdn_admin_id" value="{{user.id}}"/>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          {{user.name}}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item" href="{{HOST}}/admin/logout">Logout</a>
+        </div>
+      </li>
+      {{/if}}
+
+      <li class="machine-list">
+        <input type="hidden" id="inp_machineFilterArr" value="{{data.machineFilterArr}}">
+        {{#each data.deliveryItems}}
+          <input class="inp-filter-machine" type="checkbox" id="{{this.deviceType}}" data-filter="{{this.key}}"> {{this.key}}
+        {{/each}}
+      </li>
+     
+    </ul>
+    {{#if user.id}}
+    <form class="form-inline my-2 my-lg-0">
+      <input id="inp-global-search" class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+    </form>
+    <div id="dv-nav-search-holder" class="">
+    </div>
+    {{/if}}
+  </div>
+</nav>
+<style>
+    #dv-nav-search-holder.active{
+        display: block;
+    }
+    #dv-nav-search-holder{
+        width:250px;
+        height: 300px;
+        position: absolute;
+        top:180px;
+        right:20px;
+        display: none;
+        background:#fff;
+        border:1px solid #ccc;
+        z-index: 999;
+        overflow-y: scroll;
+    }
+    #dv-nav-search-holder a{
+      padding: 5px;
+      border-bottom:1px solid #999;
+      display: block;
+      width:100%;
+      text-decoration: none;
+      background: #eee;
+      margin-top: 2px;
+    }
+    @media screen and (min-width: 990px) {
+        #dv-nav-search-holder{
+            top:50px;
+            right:20px;
+        }
+    }
+
+    .machine-list {
+      margin-top: 4px;
+      padding: 5px 15px 5px 5px;
+      background-color: #eee;
+    }
+
+    .machine-list input {
+      margin-left: 10px;
+    }
+
+</style>
+
+<script>
+  onLoad((_w,_c)=>{
+
+    let machineFilterArr = JSON.parse($("#inp_machineFilterArr").val() || "[]")
+    if(Array.isArray(machineFilterArr)) {
+      machineFilterArr.forEach(x => {
+        if($(`#${x.replaceAll(" ","")}`)[0]) {
+          $(`#${x.replaceAll(" ","")}`)[0].checked = true;
+        }
+      });
+    }
+
+    $("#inp-global-search").on('keyup',()=>{
+      $("#dv-nav-search-holder").removeClass("active");
+      
+      let searchKey= $("#inp-global-search").val().trim();
+      let isSerchKeyPhone=false;
+      let searchKeyWithoutSpaces=searchKey.replace(/ /g,'');
+      if(searchKeyWithoutSpaces.length==10 && !isNaN(Number(searchKeyWithoutSpaces))){
+        isSerchKeyPhone=true;
+      }
+      if(isSerchKeyPhone){
+        searchKey=searchKeyWithoutSpaces;
+      }
+      if(searchKey.length>4 || searchKey.indexOf("#")==0){
+        $.ajax({
+          type:'POST',
+          url:`${_HOST}/api/admin/documents/search`,
+          data:{
+            searchKey
+          },
+          success:(res)=>{
+            if(res){
+              processSearchResult(res)
+            }
+          },
+          error:()=>{
+
+          }
+
+        })
+      }
+    });
+
+    $(".inp-filter-machine").on("click",(e)=>{
+      let machineFilterArr = [];
+      $(".inp-filter-machine").each((index,el)=>{
+        let $el = $(el);
+        if ($el[0].checked) {
+          machineFilterArr.push($el.attr('data-filter'));
+        }
+      });
+
+      $.ajax({
+        type: "POST",
+        url: `${_HOST}/api/admin/delivery/setMachineFilter`,
+        data: {
+            machineFilterArr,
+        },
+        success: (res) => {
+          if(window.location.href.includes('?')) {
+            window.location.href = window.location.href.split('?')[0];
+          }else {
+            window.location.reload();
+          }
+        },
+        error: () => {}
+      });
+    })
+
+    function processSearchResult(arr){
+      
+      $("#dv-nav-search-holder").addClass("active");
+      $("#dv-nav-search-holder").html(``)
+      if(arr.length>0){
+        for(let i=0;i<arr.length;i++){
+          let searchEl=$(`<a href="${arr[i].url}">${arr[i].document.id} | ${arr[i].document.docType} | ${arr[i].sectionName}</a>`);
+          if(arr[i].url){
+            $("#dv-nav-search-holder").append(searchEl);
+          }
+        }  
+      }else{
+        $("#dv-nav-search-holder").append('<a href="#">No Result Found<a>');
+      }
+      
+    }
+  })
+</script>

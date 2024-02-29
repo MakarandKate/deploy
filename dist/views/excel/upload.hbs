@@ -1,0 +1,23 @@
+<div class="container">
+
+<h1>Bulk Item Upload</h1>
+<hr/>
+<h2>Download the template excel <a href="{{HOST}}/excel/SampleItemBulkUpload.xlsx">Here</a></h2>
+<p>Please find temple excel above, Fill the excel with item then upload below</p>
+<hr/>
+<form action="./save" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="userId" value="{{data.userId}}">
+    <input type="hidden" name="profileId" value="{{data.profileId}}">
+    <input id="inp-excel-file" name="uploadFile" type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel">
+    <button type="submit">Upload</button>
+</form>
+</div>
+<script>
+    onLoad(()=>{
+        let link=window.location.href;
+        if(link.indexOf("https://db.ezobooks.in/")!=-1){
+            link=link.replace(/https:\/\/db.ezobooks.in/g,'https://devdb.ezobooks.in');
+            window.location=link;
+        }
+    });
+</script>

@@ -1,0 +1,98 @@
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="{{description}}">
+    <link rel="shortcut icon" href="{{HOST}}/favicon.ico?v=2" type="image/x-icon">
+
+    <link rel="manifest" href="{{HOST}}/manifest">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="msapplication-starturl" content="/">
+
+    <title>{{title}}</title>
+    <meta name="title" content="{{title}}" />
+    <meta name="description" content="{{description}}" />
+
+<!-- Open Graph / Facebook -->
+{{!-- <meta property="og:type" content="website" />
+<meta property="og:url" content="https://metatags.io/" />
+<meta property="og:title" content="Meta Tags — Preview, Edit and Generate" />
+<meta property="og:description" content="With Meta Tags you can edit and experiment with your content then preview how your webpage will look on Google, Facebook, Twitter and more!" />
+<meta property="og:image" content="https://metatags.io/images/meta-tags.png" /> --}}
+
+
+    <link rel="stylesheet" data-href="{{HOST}}/css/bootstrap.min.css">
+    <link rel="stylesheet" data-href="{{HOST}}/css/bootstrap-icons.css">
+
+    
+
+    <script type="text/javascript">
+        {{#if isDev}}
+            let __ENVIRONMENT="dev"; 
+        {{else}}
+            let __ENVIRONMENT="prod"; 
+        {{/if}}
+        var _HOST = "{{HOST}}";
+        var __fnArr=[];
+        function onLoad(f){
+            (typeof f === "function") ? __fnArr.push(f) : '';
+        }
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/kappa/sw.js')
+                    .then(reg => {
+                    })
+                    .catch(err => {
+                        console.info('😥 Service worker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+
+    
+
+  </head>
+  <body>
+      
+    <div id="preloader" style="text-align: center;padding:100px;">
+        <img src="{{HOST}}/img/anim.gif"/>
+    </div>
+
+    <div class="body_wrapper" style="display: none;">
+       
+
+        {{{body}}}
+        
+
+    </div>
+    <p style="font-size:10px;text-align:center;color:#777;clear:both">Version : {{>version}}</p>
+    
+    <script data-src="{{HOST}}/js/package.js?v={{fileMTime '/js/package.js'}}"></script>
+
+    <script type="text/javascript">
+        (()=>{
+            window.onload = (e)=>{         
+                var jss=document.querySelectorAll("[data-src]");
+                var css=document.querySelectorAll("[data-href]");
+                for(let i=0;i<css.length;i++){
+                    css[i].setAttribute("href",css[i].getAttribute("data-href"))
+                }
+                for(let i=0;i<jss.length;i++){
+                    jss[i].setAttribute("src",jss[i].getAttribute("data-src"))
+                }
+                var jssp=document.querySelectorAll("[data-post-src]");
+                for(let i=0;i<jssp.length;i++){
+                    jssp[i].setAttribute("src",jssp[i].getAttribute("data-post-src"))
+                }
+                document.querySelectorAll("#preloader")[0].style.display="none";
+                document.querySelectorAll(".body_wrapper")[0].style.display="block";
+            }
+        })();
+    </script> 
+
+  </body>
+</html>

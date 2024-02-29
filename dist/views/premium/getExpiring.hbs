@@ -1,0 +1,171 @@
+<style>
+
+.button {
+    text-align: center;
+}
+
+.button button {
+    margin: 5px;
+}
+
+.image-div {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+#img-loader {
+    display: none;
+    width: 100px;
+}
+table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+        border: 1px solid #e0e0e0;
+        padding: 12px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f8f8f8;
+        font-weight: bold;
+    }
+
+    tr:hover {
+        background-color: #f5f5f5;
+    }
+
+</style>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3>Expiring Licence</h3>
+                </div>
+                <div class="card-body">
+                    <div class="button">
+                        <button class="btn btn-primary" id="btn-expiring-7days">Expired in Last 7 days</button>
+                        <button class="btn btn-primary" id="btn-expiring-today">Expiring Today</button>
+                        <button class="btn btn-primary" id="btn-expiring-45days">Expiring in 45 days</button>
+                    </div>
+                </div>
+                <span class="image-div">
+                    <img id="img-loader" src="{{HOST}}/svg/spin.svg" alt="Loading"/>
+                </span>
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>Index</th>
+                            <th>User ID</th>
+                            <th>Activation Time</th>
+                            <th>Expire Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="data-row-holder"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+ onLoad((_w, _c) => {
+    let startTime = +new Date().setHours(0, 0, 0, 0);
+
+    $("#btn-expiring-7days").on('click', (e) => {
+        let endTime = startTime 
+        let lastTime = startTime - 7 * 24 * 60 * 60 * 1000;
+        $("#img-loader").show();
+        getData(lastTime, endTime);
+    });
+
+    $("#btn-expiring-today").on('click', (e) => {
+        let endTime = startTime + 86400000 - 1; 
+        $("#img-loader").show();
+        getData(startTime, endTime);
+    });
+
+    $("#btn-expiring-45days").on('click', (e) => {
+        let endTime = startTime + 45 * 24 * 60 * 60 * 1000;
+        $("#img-loader").show();
+        getData(startTime, endTime);
+    });
+
+});
+    //caling api to get data
+    function getData(startTime,endTime) {
+        $.ajax({
+            type: "POST",
+            url: `${_HOST}/premium/getExpiringByTimeRange`,
+            data: {
+                startTime,
+                endTime
+            },
+            success: (res) => {
+                if (res?.status === 'success' && res?.licences) {
+                    $("#img-loader").hide();
+                    if (Array.isArray(res?.licences)) {
+                        $("#data-row-holder").html("");
+                        for (let i = 0; i < res?.licences?.length; i++) {
+                            addRowFn(res?.licences[i]);
+                        }
+                    }
+                }else if (res?.status ==='failed'){
+                    $("#img-loader").hide();
+                    alert("Failed to load data !");
+                }
+            },
+            error: () => { 
+                $("#img-loader").hide();
+                alert("Failed to load data !");
+            }
+        });
+    }
+
+    //adding data to view
+    addRowFn = (licence) => {
+        let index = $("#data-row-holder tr").length + 1;
+        let row = `
+            <tr>
+                <td>${index}</td>
+                <td>${licence.userId}</td>
+                <td>${stampToDate(licence.proActivationStamp) || '-'}</td>
+                <td>${stampToDate(licence.proExpiryStamp) || '-'}</td>
+            </tr>`;
+        $("#data-row-holder").append(row);
+    }
+
+    function stampToDate(stamp) {
+        if(!stamp) {
+            return '';
+        }
+        let dt=new Date(stamp);
+        let dd=("0"+(dt.getDate())).slice(-2);
+        let mm=("0"+(dt.getMonth()+1)).slice(-2);
+        let yy=dt.getFullYear();
+        let nHH=dt.getHours();
+        let ap='AM';
+        if(nHH>12){
+            ap='PM';
+            nHH-=12;
+        }else if(nHH==12){
+            ap='PM';
+        }
+        let hh=("0"+(nHH)).slice(-2);
+        let MM=("0"+(dt.getMinutes())).slice(-2);
+        let SS=("0"+(dt.getSeconds())).slice(-2);
+        
+        return dd+'/'+mm+'/'+yy+' '+hh+':'+MM+':'+SS +' '+ap;
+    }
+</script>
+</body>
+</html>
+
+

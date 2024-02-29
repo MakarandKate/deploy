@@ -1,0 +1,328 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<style>
+    *{
+        padding: 0;
+        margin: 0;
+    }
+    h1{
+        font-size: 18px;
+        margin: 0;
+        padding: 0;
+    }
+    h2{
+        font-size: 16px;
+        margin: 0;
+        padding: 0;
+    }
+    table{
+        width: 100%;
+    }
+    @media print{
+        .no-print{
+            display:none;
+        }
+    }
+</style>
+<div class="container">
+    <button style="float: right;margin:10px" class="btn btn-primary no-print" id="btn-download">Download PDF <i class="bi bi-cloud-download"></i></button>
+    <hr style="clear: both;"/>
+    <h1>Daybook Report ({{data.dayBookReportData.dateStr}})</h1>
+    <h2>{{profileDisplayId data.dayBookReportData.profile._localUUID}} - {{data.dayBookReportData.profile.profileName}}</h2>
+    <hr/>
+
+
+    <div class="jumbotron">
+        <h3 class="">Trends<small><span class="badge badge-primary badge-pill">New</span></small></h3>
+        <hr class="my-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <p class="lead">Moving average has been {{#if data.dayBookReportData.trends.threeDaysMovingAvgChangePercentagePositive }} increased {{else}} decreased {{/if}} by <span class="badge badge-pill {{#if data.dayBookReportData.trends.threeDaysMovingAvgChangePercentagePositive }} badge-success {{else}} badge-danger {{/if}}">{{data.dayBookReportData.trends.threeDaysMovingAvgChangePercentage}}%</span></p>
+                    {{#if data.dayBookReportData.trends.prevDaysDataAvailable}}
+                    <p class="lead">Sales compared to last <b>{{data.dayBookReportData.trends.day0Name}}</b> : <span class="badge badge-pill {{#if data.dayBookReportData.trends.day0LastWeekChangePercentagePositive }} badge-success {{else}} badge-danger {{/if}}">{{data.dayBookReportData.trends.day0LastWeekChangePercentage}}%</span></p>
+                    <p class="lead">Sales compared to last <b>{{data.dayBookReportData.trends.day1Name}}</b> : <span class="badge badge-pill {{#if data.dayBookReportData.trends.day1LastWeekChangePercentagePositive }} badge-success {{else}} badge-danger {{/if}}">{{data.dayBookReportData.trends.day1LastWeekChangePercentage}}%</span></p>
+                    <p class="lead">Sales compared to last <b>{{data.dayBookReportData.trends.day2Name}}</b> : <span class="badge badge-pill {{#if data.dayBookReportData.trends.day2LastWeekChangePercentagePositive }} badge-success {{else}} badge-danger {{/if}}">{{data.dayBookReportData.trends.day2LastWeekChangePercentage}}%</span></p>
+                    {{else}}
+                    <p class="lead">Daywise Sales comparison will be available after 10 days of app usage</p>
+                    <p class="lead">Example:: Sales compared to last Monday : <span class="badge badge-pill badge-success">4.67%</span></p>
+                    {{/if}}
+                </div>
+                <div class="col-sm-6">
+                    <h3>Janiye aapke business me tarraki kaise laye free me.</h3>
+                    <p>Follow kijiye Ezo ko business chanel instagram pe</p>
+                    <h3><a href="https://www.instagram.com/ezobooksofficial/" target="_blank">@ezobooksofficial</a></h3>
+
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+    <div class="row">
+        <div class="col-sm-3">
+            <p>Sale : <b>{{representAsWhole data.dayBookReportData.totalSalesAmount}}</b>
+                {{#if data.dayBookReportData.totalSalesAmountChangePercentagePositive}}
+                    <span class="text-success"><i class="bi bi-chevron-double-up"></i> {{data.dayBookReportData.totalSalesAmountChangePercentage}}%</span>
+                {{else}} 
+                    <span class="text-danger"><i class="bi bi-chevron-double-down"></i> {{data.dayBookReportData.totalSalesAmountChangePercentage}}%</span>
+
+                {{/if}}
+            </p>
+            <p>MoneyIn: <b>{{representAsWhole data.dayBookReportData.totalMoneyInsAmount}}</b></p>
+            <p>Purchase : <b>{{representAsWhole data.dayBookReportData.totalPurchasesAmount}}</b></p>
+            <p>MoneyOut: <b>{{representAsWhole data.dayBookReportData.totalMoneyOutsAmount}}</b></p>
+        </div>
+        <div class="col-sm-3">
+            <p>Cash In Hand: <b>{{representAsWhole data.dayBookReportData.totalCashInHandAmount}}</b></p>
+            <p>UPI: <b>{{representAsWhole data.dayBookReportData.totalUPIAmount}}</b></p>
+            <p>Cheque: <b>{{representAsWhole data.dayBookReportData.totalChequeAmount}}</b></p>
+            <p>Cash: <b>{{representAsWhole data.dayBookReportData.totalCashAmount}}</b></p>
+        </div>
+        <div class="col-sm-6">
+            <div id="piechart" style="width: auto; height: 300px;"></div>
+        </div>
+        <div class="col-sm-12">
+            <div id="hourlychart"></div>
+
+        </div>
+        <div class="col-sm-12">
+            <div id="weeklychart"></div>
+
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-sm-12">
+            <hr/>
+        </div>
+    </div>
+    <div class="row"> 
+        <div class="col-sm-6">
+            <h2>Items List</h2>
+            <table class="table table-responsive table-stripped">
+                <thead>
+                    <tr>
+                        <th>Sr</th>
+                        <th>Item</th>
+                        <th>Quantity</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each data.dayBookReportData.itemList}}
+                        <tr>
+                            <td>
+                                {{inc @index}}
+                            </td>
+                            <td>
+                                {{this.itemName}}
+                            </td>
+                            <td>
+                                {{representAsWhole this.quantity}}
+                            </td>
+                            <td>
+                                {{representAsWhole this.totalSalePrice}}
+                            </td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-6">
+            <h2>Category List</h2>
+            <table class="table table-responsive table-stripped">
+                <thead>
+                    <tr>
+                        <th>Sr</th>
+                        <th>Category</th>
+                        <th>Quantity</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each data.dayBookReportData.categoryList}}
+                        <tr>
+                            <td>
+                                {{inc @index}}
+                            </td>
+                            <td>
+                                {{this.categoryName}}
+                            </td>
+                            <td>
+                                {{representAsWhole this.quantity}}
+                            </td>
+                            <td>
+                                {{representAsWhole this.totalSalePrice}}
+                            </td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-12">
+            <h2>Sale List</h2>
+            <table class="table table-responsive table-stripped">
+                <thead>
+                    <tr>
+                        <th>Sr</th>
+                        <th>No</th>
+                        <th>Party</th>
+                        <th>Amount</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each data.dayBookReportData.saleList}}
+                        <tr>
+                            <td>{{inc @index}}</td>
+                            <td>{{this.billNo}}</td>
+                            <td>{{this.party.name}}</td>
+                            <td>{{representAsWhole this.totalAmount}}</td>
+                            <td>{{stampToSimpleTime this.billCompleteStamp}}</td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+
+</div>
+
+<script>
+    onLoad(()=>{
+        $("#btn-download").on('click',()=>{
+            let a=document.createElement('a');
+            a.href=`https://pdf.ezobooks.in/DayBookReport?name=DayBookReport&url=${window.location.href}`;
+            a.target="_blank";
+            a.click();
+
+        });
+        google.charts.load('current', {
+            'packages':['corechart','bar','line'],
+            'mapsApiKey':'AIzaSyDS3O3U7T0G8uhfy2n4hx3hgRk23rDcfkI'
+        });
+        google.charts.setOnLoadCallback(drawChart);
+    })
+
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+          ['Mode', 'Amount'],
+          ['Cash : {{data.dayBookReportData.totalCashAmount}}',     {{representAsWhole data.dayBookReportData.totalCashAmount}}],
+          ['UPI/Bank : {{data.dayBookReportData.totalUPIAmount}}',      {{representAsWhole data.dayBookReportData.totalUPIAmount}}],
+          ['Cheque : {{data.dayBookReportData.totalChequeAmount}}',  {{representAsWhole data.dayBookReportData.totalChequeAmount}}]
+        ]);
+
+        var options = {
+          title: 'Money Collected',
+          pieSliceText: 'value'
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+        chart.draw(data, options);
+        drawHourlyChart();
+    }
+
+    function drawHourlyChart(){
+        var data = google.visualization.arrayToDataTable([
+          ['Hour', 'Sales', 'MoneyIn'],
+          ['12AM', {{data.dayBookReportData.hourlyCount.0.sale}}, {{data.dayBookReportData.hourlyCount.0.moneyIn}}],
+          ['1AM', {{data.dayBookReportData.hourlyCount.1.sale}}, {{data.dayBookReportData.hourlyCount.1.moneyIn}}],
+          ['2AM', {{data.dayBookReportData.hourlyCount.2.sale}}, {{data.dayBookReportData.hourlyCount.2.moneyIn}}],
+          ['3AM', {{data.dayBookReportData.hourlyCount.3.sale}}, {{data.dayBookReportData.hourlyCount.3.moneyIn}}],
+          ['4AM', {{data.dayBookReportData.hourlyCount.4.sale}}, {{data.dayBookReportData.hourlyCount.4.moneyIn}}],
+          ['5AM', {{data.dayBookReportData.hourlyCount.5.sale}}, {{data.dayBookReportData.hourlyCount.5.moneyIn}}],
+          ['6AM', {{data.dayBookReportData.hourlyCount.6.sale}}, {{data.dayBookReportData.hourlyCount.6.moneyIn}}],
+          ['7AM', {{data.dayBookReportData.hourlyCount.7.sale}}, {{data.dayBookReportData.hourlyCount.7.moneyIn}}],
+          ['8AM', {{data.dayBookReportData.hourlyCount.8.sale}}, {{data.dayBookReportData.hourlyCount.8.moneyIn}}],
+          ['9AM', {{data.dayBookReportData.hourlyCount.9.sale}}, {{data.dayBookReportData.hourlyCount.9.moneyIn}}],
+          ['10AM', {{data.dayBookReportData.hourlyCount.10.sale}}, {{data.dayBookReportData.hourlyCount.10.moneyIn}}],
+          ['11AM', {{data.dayBookReportData.hourlyCount.11.sale}}, {{data.dayBookReportData.hourlyCount.11.moneyIn}}],
+          ['12PM', {{data.dayBookReportData.hourlyCount.12.sale}}, {{data.dayBookReportData.hourlyCount.12.moneyIn}}],
+          ['1PM', {{data.dayBookReportData.hourlyCount.13.sale}}, {{data.dayBookReportData.hourlyCount.13.moneyIn}}],
+          ['2PM', {{data.dayBookReportData.hourlyCount.14.sale}}, {{data.dayBookReportData.hourlyCount.14.moneyIn}}],
+          ['3PM', {{data.dayBookReportData.hourlyCount.15.sale}}, {{data.dayBookReportData.hourlyCount.15.moneyIn}}],
+          ['4PM', {{data.dayBookReportData.hourlyCount.16.sale}}, {{data.dayBookReportData.hourlyCount.16.moneyIn}}],
+          ['5PM', {{data.dayBookReportData.hourlyCount.17.sale}}, {{data.dayBookReportData.hourlyCount.17.moneyIn}}],
+          ['6PM', {{data.dayBookReportData.hourlyCount.18.sale}}, {{data.dayBookReportData.hourlyCount.18.moneyIn}}],
+          ['7PM', {{data.dayBookReportData.hourlyCount.19.sale}}, {{data.dayBookReportData.hourlyCount.19.moneyIn}}],
+          ['8PM', {{data.dayBookReportData.hourlyCount.20.sale}}, {{data.dayBookReportData.hourlyCount.20.moneyIn}}],
+          ['9PM', {{data.dayBookReportData.hourlyCount.21.sale}}, {{data.dayBookReportData.hourlyCount.21.moneyIn}}],
+          ['10PM', {{data.dayBookReportData.hourlyCount.22.sale}}, {{data.dayBookReportData.hourlyCount.22.moneyIn}}],
+          ['11PM', {{data.dayBookReportData.hourlyCount.23.sale}}, {{data.dayBookReportData.hourlyCount.23.moneyIn}}],      
+        ]);
+
+        var view = new google.visualization.DataView(data);
+      view.setColumns([0,1,
+                    
+                       2,
+                       { calc: "stringify",
+                         sourceColumn: 2,
+                         type: "string",
+                         role: "annotation" }]);
+
+        var options = {
+          chart: {
+            title: 'Hourly Sale & MoneyIn',
+            subtitle: 'Sales, Collection',
+          },
+          bars: 'vertical',
+          vAxis: {format: 'decimal'},
+          height: 400,
+          colors: ['#01a3a4', '#5f27cd', '#7570b3']
+        };
+
+        //var chart = new google.charts.Bar(document.getElementById('hourlychart'));
+        var chart = new google.visualization.ColumnChart(document.getElementById("hourlychart"));
+
+        chart.draw(view,options);
+        drawWeeklyChart();
+    }
+
+    function drawWeeklyChart(){
+        var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Day');
+      data.addColumn('number', 'Sale Value');
+      data.addColumn({type: 'number', role: 'annotation'});
+      data.addColumn('number','Money In');
+      data.addColumn({type: 'number', role: 'annotation'});
+      data.addColumn('number','Moving Avg');
+      data.addRows([
+          ['{{data.dayBookReportData.weeklyCount.0.day}}', {{data.dayBookReportData.weeklyCount.0.sale}},{{data.dayBookReportData.weeklyCount.0.sale}}, {{data.dayBookReportData.weeklyCount.0.moneyIn}}, {{data.dayBookReportData.weeklyCount.0.moneyIn}}, {{data.dayBookReportData.weeklyCount.0.threeDaysMovingAvg}}],
+          ['{{data.dayBookReportData.weeklyCount.1.day}}', {{data.dayBookReportData.weeklyCount.1.sale}},{{data.dayBookReportData.weeklyCount.1.sale}}, {{data.dayBookReportData.weeklyCount.1.moneyIn}}, {{data.dayBookReportData.weeklyCount.1.moneyIn}}, {{data.dayBookReportData.weeklyCount.1.threeDaysMovingAvg}}],
+          ['{{data.dayBookReportData.weeklyCount.2.day}}', {{data.dayBookReportData.weeklyCount.2.sale}},{{data.dayBookReportData.weeklyCount.2.sale}}, {{data.dayBookReportData.weeklyCount.2.moneyIn}}, {{data.dayBookReportData.weeklyCount.2.moneyIn}}, {{data.dayBookReportData.weeklyCount.2.threeDaysMovingAvg}}],
+          ['{{data.dayBookReportData.weeklyCount.3.day}}', {{data.dayBookReportData.weeklyCount.3.sale}},{{data.dayBookReportData.weeklyCount.3.sale}}, {{data.dayBookReportData.weeklyCount.3.moneyIn}}, {{data.dayBookReportData.weeklyCount.3.moneyIn}}, {{data.dayBookReportData.weeklyCount.3.threeDaysMovingAvg}}],
+          ['{{data.dayBookReportData.weeklyCount.4.day}}', {{data.dayBookReportData.weeklyCount.4.sale}},{{data.dayBookReportData.weeklyCount.4.sale}}, {{data.dayBookReportData.weeklyCount.4.moneyIn}}, {{data.dayBookReportData.weeklyCount.4.moneyIn}}, {{data.dayBookReportData.weeklyCount.4.threeDaysMovingAvg}}],
+          ['{{data.dayBookReportData.weeklyCount.5.day}}', {{data.dayBookReportData.weeklyCount.5.sale}},{{data.dayBookReportData.weeklyCount.5.sale}}, {{data.dayBookReportData.weeklyCount.5.moneyIn}}, {{data.dayBookReportData.weeklyCount.5.moneyIn}}, {{data.dayBookReportData.weeklyCount.5.threeDaysMovingAvg}}],
+          ['{{data.dayBookReportData.weeklyCount.6.day}}', {{data.dayBookReportData.weeklyCount.6.sale}},{{data.dayBookReportData.weeklyCount.6.sale}}, {{data.dayBookReportData.weeklyCount.6.moneyIn}}, {{data.dayBookReportData.weeklyCount.6.moneyIn}}, {{data.dayBookReportData.weeklyCount.6.threeDaysMovingAvg}}],
+          ['{{data.dayBookReportData.weeklyCount.7.day}}', {{data.dayBookReportData.weeklyCount.7.sale}},{{data.dayBookReportData.weeklyCount.7.sale}}, {{data.dayBookReportData.weeklyCount.7.moneyIn}}, {{data.dayBookReportData.weeklyCount.7.moneyIn}}, {{data.dayBookReportData.weeklyCount.7.threeDaysMovingAvg}}],
+          ['{{data.dayBookReportData.weeklyCount.8.day}}', {{data.dayBookReportData.weeklyCount.8.sale}},{{data.dayBookReportData.weeklyCount.8.sale}}, {{data.dayBookReportData.weeklyCount.8.moneyIn}}, {{data.dayBookReportData.weeklyCount.8.moneyIn}}, {{data.dayBookReportData.weeklyCount.8.threeDaysMovingAvg}}],
+          ['{{data.dayBookReportData.weeklyCount.9.day}}', {{data.dayBookReportData.weeklyCount.9.sale}},{{data.dayBookReportData.weeklyCount.9.sale}}, {{data.dayBookReportData.weeklyCount.9.moneyIn}}, {{data.dayBookReportData.weeklyCount.9.moneyIn}}, {{data.dayBookReportData.weeklyCount.9.threeDaysMovingAvg}}],
+          ['{{data.dayBookReportData.weeklyCount.10.day}}', {{data.dayBookReportData.weeklyCount.10.sale}},{{data.dayBookReportData.weeklyCount.10.sale}}, {{data.dayBookReportData.weeklyCount.10.moneyIn}}, {{data.dayBookReportData.weeklyCount.10.moneyIn}}, {{data.dayBookReportData.weeklyCount.10.threeDaysMovingAvg}}],
+      ]);
+
+      var options = {
+        title: 'Daywise Sales',
+        curveType: 'function',
+        legend: { position: 'bottom' },
+        height:400,
+        colors:['#0652DD','#ED4C67','#00b894'],
+        series: {
+          0: {
+            pointSize: 10,
+            pointShape: 'circle',
+            dataLabels: {
+              textStyle: {
+                fontSize: 12,
+                color: 'black'
+              }
+            }
+          }
+        }
+      };
+
+      var chart = new google.visualization.LineChart(document.getElementById('weeklychart'));
+      chart.draw(data, options);
+    }
+</script>

@@ -1,0 +1,74 @@
+<div class="container">
+    <input type="date" id="inp-date"/>
+    <button class="btn btn-primary" id="btn">Submit</button>
+    <form id="form" method="get" action="./lastBill">
+        <input type="hidden" id="inp-stamp" name="deliveredDateStart"/>
+    </form>
+    <table class="table table-stripped">
+        <thead>
+            <tr>
+                <th>Sr</th>
+                <th>Phone</th>
+                <th>Booking Date</th>
+                <th>Delivery Date</th>
+                <th>App Type</th>
+                <th>Total Sales</th>
+                <th>Last Bill Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each data.deliveredArr}}
+                <tr data-phone="{{this.phone}}">
+                    <td>{{inc @index}}</td>
+                    <td>{{this.phone}}</td>  
+                    <td>{{stampToSimpleDate this.bookingStamp}}</td>
+                    <td>{{stampToSimpleDate this.deliveredStamp}}</td>
+                    <td class="apptype"></td>
+                    <td class="totalsale"></td>
+                    <td class="lastbilldate"></td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    onLoad(()=>{
+        $("#btn").on('click',()=>{
+            let dt=$("#inp-date").val();
+            let d=new Date(dt);
+            d.setHours(0,0,0,0);
+            $("#inp-stamp").val(+d);
+            $("#form").submit();
+        })
+        let phoneArr=[];
+        $("tr[data-phone]").each(async (i,el)=>{
+            let phone=$(el).attr('data-phone');
+            phoneArr.push(phone);
+        });
+        fetchDetails(phoneArr);
+    })
+
+    async function fetchDetails(phoneArr){
+        for(let i=0;i<phoneArr.length;i++){
+            let phone=phoneArr[i];
+            let details=await getDeatils(phone);
+            $(`tr[data-phone='${phone}'] td.apptype`).text(details.appType);
+            $(`tr[data-phone='${phone}'] td.totalsale`).text(details.totalSales);
+            $(`tr[data-phone='${phone}'] td.lastbilldate`).text(details.lastBillDate);
+        }
+    }
+    function getDeatils(phone){
+        return new Promise((resolve)=>{
+            $.ajax({
+                url:`${_HOST}/dashboard/lastBillData?phone=${phone}`,
+                method:'GET',
+                success:(res)=>{
+                    if(res.status=="success"){
+                        resolve(res);
+                    }
+                }
+            })
+        });
+    }
+</script>

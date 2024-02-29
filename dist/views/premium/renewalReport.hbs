@@ -1,0 +1,203 @@
+<style>
+    h2 {
+        text-align: center;
+        padding: 10px;
+        color: #007bff;
+        background: #E8F1FF;
+    }
+
+    .filter-text {
+        color: #007bff;
+        padding-left: 15px;
+        font-size: 15px;
+    }
+
+    .date-label {
+        font-weight: 500;
+        color: #007bff;
+        margin-left: 15px;
+        font-size: 12px;
+        margin-bottom: 5px;
+
+        input {
+            color: #007bff;
+            background-color: #FFFFFF;
+            border: 1px solid #007bff;
+            border-radius: 15px;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin-left: 5px;
+            margin-top: 10px;
+        }
+
+    }
+
+    .btn {
+        padding-top: 2px !important;
+        padding-bottom: 2px !important;
+        position: relative;
+        bottom: 2px;
+        margin-left: 10px;
+        margin-top: 5px;
+        font-size: 12px;
+        border-radius: 20px;
+        padding: 5px 20px;
+        border: 1px solid #007bff;
+        background: #007bff;
+        color: #ffffff;
+    }
+
+    .table-container {
+        margin: 10px;
+
+        table {
+            width: 100%;
+            font-size: 12px;
+            text-align: center;
+        }
+    }
+
+    .table-header {
+        color: #007bff;
+        background-color: rgb(0, 123, 255, 0.1);
+        height: 35px;
+    }
+</style>
+
+<div>
+    <h2>
+        Renewal Report
+    </h2>
+    <div>
+        <div class="filter-text">
+            Pro Expiry Date Filter:
+        </div>
+        <label class="date-label">
+            Start Date
+            <input type="date" id="inp-start-date">
+        </label>
+        <label class="date-label">
+            End Date
+            <input type="date" id="inp-end-date">
+        </label>
+        <input type="button" class="btn" value="Generate Report" id="btn-generate-report">
+        <input id="btnDownloadCSV" class="btn" type="button" value="Download CSV" id="btn-download-csv">
+    </div>
+    <div class="table-container">
+        <table class="table table-striped">
+            <thead>
+                <tr class="table-header">
+                    <th>Sr. No.</th>
+                    <th>Phone</th>
+                    <th>App Type</th>
+                    <th>Business Type</th>
+                    <th>Invoice Count</th>
+                    <th>Last Active date </th>
+                    <th>Pro Active Date</th>
+                    <th>Pro Expiry Date</th>
+                    <th>Product Sold</th>
+                    <th>Sale Price</th>
+                    <th>Software Validity</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    onLoad(()=>{
+        let dataList = [];
+        $("#btn-generate-report").on('click', ()=>{
+            $("tbody").empty();
+            const startTime = +new Date($("#inp-start-date").val());
+            const endTime = +new Date($("#inp-end-date").val()) + 86400000;
+            $.ajax({
+                type:'POST',
+                url:`${_HOST}/premium/renewal/getReportData`,
+                data:{
+                    startTime,
+                    endTime
+                },
+                success:(res)=>{
+                    if(res?.status=="success"){
+                        if(res?.leads?.length && Array.isArray(res?.leads)) {
+                            dataList = res?.leads;
+                            const leads = res?.leads;
+                            leads?.forEach((lead,index) => {
+                                $("tbody").append(`
+                                    <tr>
+                                        <td>${index+1}</td>
+                                        <td>${lead?.phone || '-'}</td>
+                                        <td>${lead?.appType || '-'}</td>
+                                        <td>${lead?.businessType || '-'}</td>
+                                        <td>${lead?.saleCount || '-'}</td>
+                                        <td>${stampToSimpleDate(lead?.lastActiveStamp) || '-'}</td>
+                                        <td>${stampToSimpleDate(lead?.proActivationStamp) || '-'}</td>
+                                        <td>${stampToSimpleDate(lead?.proExpiryStamp) || '-'}</td>
+                                        <td>${lead?.machineSold || '-'}</td>
+                                        <td>${lead?.salePrice || '-'}</td>
+                                        <td>${lead?.softwareValidity || '-'}</td>
+                                        <td>${lead?.note || '-'}</td>
+                                    </tr>
+                                `);
+                            });
+                        }
+                    }else{
+                        alert(res?.message || 'Something Went Wrong');
+                    }
+                },
+                error:()=>{
+                    alert('Something Went Wrong');
+                }
+            });
+        });
+
+        $("#btnDownloadCSV").on("click",(e) => {
+            $.ajax({
+                type: "POST",
+                url: `${_HOST}/premium/renewal/getAllCSVData`,
+                data: {
+                    dataList
+                },
+                success: (res) => {
+                    if(res.status=="success"){
+                        var link = document.createElement("a");
+                        link.setAttribute("href", res.csvContent);
+                        link.setAttribute("download", `renewal_report_${+new Date()}.csv`);
+                        document.body.appendChild(link);
+                        link.click(); 
+                    }
+                },
+                error: () => {}
+            });
+        });
+
+    });
+
+    function stampToSimpleDate(stamp) {
+        if(stamp==0 ){
+            return "-";
+        }
+        let dt=new Date(+stamp);
+        let dd=("0"+(dt.getDate())).slice(-2);
+        let mm=("0"+(dt.getMonth()+1)).slice(-2);
+        let yy=dt.getFullYear();
+        let nHH=dt.getHours();
+        let ap='AM';
+        if(nHH>12){
+            ap='PM';
+            nHH-=12;
+        }else if(nHH==12){
+            ap='PM';
+        }
+        let hh=("0"+(nHH)).slice(-2);
+        let MM=("0"+(dt.getMinutes())).slice(-2);
+        let SS=("0"+(dt.getSeconds())).slice(-2);
+        
+        return dd+'/'+mm+'/'+yy;
+    }
+</script>

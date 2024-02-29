@@ -1,0 +1,457 @@
+<style>
+
+    .container {
+        display: flex;
+        justify-content: center;
+    }
+
+    .row-phone {
+        margin-top: 20px;
+    }
+
+    #inp-phone {
+        padding: 5px;
+    }
+
+    #btn-start-migration {
+        position: relative;
+        bottom: 2px;
+    }
+
+    /* loader, success, fail container */
+    #yesterday-pro-stamp-loader-container,
+    #yesterday-pro-stamp-success-container,
+    #yesterday-pro-stamp-fail-container,
+    #move-user-to-fast-loader-container,
+    #move-user-to-fast-success-container,
+    #move-user-to-fast-fail-container,
+    #remaining-pro-stamp-loader-container,
+    #remaining-pro-stamp-success-container,
+    #remaining-pro-stamp-fail-container,
+    #creating-existing-profiles-loader-container,
+    #creating-existing-profiles-success-container,
+    #creating-existing-profiles-fail-container,
+    #creating-existing-item-party-categories-loader-container,
+    #creating-existing-item-party-categories-success-container,
+    #creating-existing-item-party-categories-fail-container,
+    #btn-start-form-copy-profile,
+    #already-fast-text {
+        display: flex;
+        justify-content: left;
+        height: 50px;
+        align-items: center;
+    }
+
+    #already-fast-text {
+        color: red;
+    }
+
+    /* loader css */
+    .loader {
+        width: 20px;
+        height: 20px;
+        display: grid;
+        border-radius: 50%;
+        -webkit-mask:radial-gradient(farthest-side,#0000 40%,#000 41%);
+        background:
+            linear-gradient(0deg ,#766DF480 50%,#766DF4FF 0) center/2px 100%,
+            linear-gradient(90deg,#766DF440 50%,#766DF4BF 0) center/100% 2px;
+        background-repeat: no-repeat;
+        animation: s3 1s infinite steps(12);
+    }
+    .loader::before,
+    .loader::after {
+        content:"";
+        grid-area: 1/1;
+        border-radius: 50%;
+        background:inherit;
+        opacity: 0.915;
+        transform: rotate(30deg);
+    }
+    .loader::after {
+        opacity: 0.83;
+        transform: rotate(60deg);
+    }
+
+    @keyframes s3 {
+        100% {transform: rotate(1turn)}
+    }
+
+    /* loader text */
+    .loader-text,
+    .success-text,
+    .fail-text {
+        margin-left: 10px;
+    }
+
+    /* bootstrap success, fail icons */
+    i {
+        font-size: 20px;
+    }
+
+    .success-icon {
+        color: #008000;
+    }
+
+    .fail-icon {
+        color: #ff0000;
+    }
+    
+</style>
+
+<div class="container">
+    <div class="row-phone">
+        <div class="col-lg-12 mb-2">
+            <input id="inp-phone" placeholder="Phone" type="number">
+            <button class="btn btn-primary" type="button" id="btn-start-migration" onclick="startMigrationProcess()">Start Migration Process</button>
+        </div>
+
+        <div id="already-fast-text">
+                User is already in Fast
+        </div>
+
+        {{! adding yesterday pro stamp }}
+        <div id="yesterday-pro-stamp-loader-container">
+            <div class="loader"></div>
+            <div class="loader-text">
+                initialized process of adding yesterday pro stamp
+            </div> 
+        </div>
+        <div id="yesterday-pro-stamp-success-container">
+            <i class="bi bi-check2-circle success-icon"></i>
+            <div class="success-text">
+                successfully added yesterday pro stamp
+            </div> 
+        </div>
+        <div id="yesterday-pro-stamp-fail-container">
+            <i class="bi bi-x-circle fail-icon"></i>
+            <div class="fail-text">
+                Failed to add yesterday pro stamp
+            </div> 
+        </div>
+
+        {{! move user to fast }}
+        <div id="move-user-to-fast-loader-container">
+            <div class="loader"></div>
+            <div class="loader-text">
+                initialized process of move user to fast
+            </div> 
+        </div>
+        <div id="move-user-to-fast-success-container">
+            <i class="bi bi-check2-circle success-icon"></i>
+            <div class="success-text">
+                successfully moved user to fast
+            </div> 
+        </div>
+        <div id="move-user-to-fast-fail-container">
+            <i class="bi bi-x-circle fail-icon"></i>
+            <div class="fail-text">
+                Failed to move user to fast
+            </div> 
+        </div>
+
+        {{! remaining pro stamp update }}
+        <div id="remaining-pro-stamp-loader-container">
+            <div class="loader"></div>
+            <div class="loader-text">
+                initialized process of adding pro stamp 
+            </div> 
+        </div>
+        <div id="remaining-pro-stamp-success-container">
+            <i class="bi bi-check2-circle success-icon"></i>
+            <div class="success-text">
+                successfully added pro stamp
+            </div> 
+        </div>
+        <div id="remaining-pro-stamp-fail-container">
+            <i class="bi bi-x-circle fail-icon"></i>
+            <div class="fail-text">
+                Failed to add pro stamp
+            </div> 
+        </div>
+
+        {{! start copy profile, item, party, item category, party category }}
+        <div id="btn-start-form-copy-profile">
+            <button class="btn btn-info" type="button" onclick="startFromCopyProfile()">Start Copy Profile Process</button>
+        </div>
+
+        {{! creating all existing profiles in fast }}
+        <div id="creating-existing-profiles-loader-container">
+            <div class="loader"></div>
+            <div class="loader-text">
+                creating existing profiles in fast
+            </div> 
+        </div>
+        <div id="creating-existing-profiles-success-container">
+            <i class="bi bi-check2-circle success-icon"></i>
+            <div class="success-text">
+                successfully created existing profiles in fast
+            </div> 
+        </div>
+        <div id="creating-existing-profiles-fail-container">
+            <i class="bi bi-x-circle fail-icon"></i>
+            <div class="fail-text">
+                Failed to create existing profiles in fast
+            </div> 
+        </div>
+
+        {{! creating all existing item, party and categories in fast }}
+        <div id="creating-existing-item-party-categories-loader-container">
+            <div class="loader"></div>
+            <div class="loader-text">
+                creating existing item, party and categories in fast
+            </div> 
+        </div>
+        <div id="creating-existing-item-party-categories-success-container">
+            <i class="bi bi-check2-circle success-icon"></i>
+            <div class="success-text">
+                successfully created existing item, party and categories in fast
+            </div> 
+        </div>
+        <div id="creating-existing-item-party-categories-fail-container">
+            <i class="bi bi-x-circle fail-icon"></i>
+            <div class="fail-text">
+                Failed to create existing item, party and categories in fast
+            </div> 
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+    onLoad(() => {
+        $("#already-fast-text").hide();
+        $("#yesterday-pro-stamp-loader-container").hide();
+        $("#yesterday-pro-stamp-success-container").hide();
+        $("#yesterday-pro-stamp-fail-container").hide();
+        $("#move-user-to-fast-loader-container").hide();
+        $("#move-user-to-fast-success-container").hide();
+        $("#move-user-to-fast-fail-container").hide();
+        $("#remaining-pro-stamp-loader-container").hide();
+        $("#remaining-pro-stamp-success-container").hide();
+        $("#remaining-pro-stamp-fail-container").hide();
+        $("#creating-existing-profiles-loader-container").hide();
+        $("#creating-existing-profiles-success-container").hide();
+        $("#creating-existing-profiles-fail-container").hide();
+        $("#creating-existing-item-party-categories-loader-container").hide();
+        $("#creating-existing-item-party-categories-success-container").hide();
+        $("#creating-existing-item-party-categories-fail-container").hide();
+        $("#btn-start-form-copy-profile").hide();
+    })
+
+    function isFastUser(phone) {
+        return new Promise((resolve,reject) => {
+            try {
+                $.ajax({
+                    type: "GET",
+                    url: `https://ezobanks.com:5001/api/v2/user/proUserStampByPhone?phone=${phone}`,
+                    success: (res) => {
+                        localStorage.setItem(phone,JSON.stringify(res?.isPro || 0));
+                        return resolve(Boolean(res?.ezo_lightning));
+                    },
+                    error: () => {
+                        return resolve(false);
+                    }
+                });
+            }catch(e) {
+                return resolve(null);
+            }
+        });
+    }
+
+    function updateUserProDetails(phone,isProStamp) {
+        return new Promise((resolve,reject) => {
+            $.ajax({
+                type: "POST",
+                url: `https://ezobanks.com:5001/api/v2/user/updateUserProDetails`,
+                data: {
+                    phoneNo: phone,
+                    isProStamp,
+                    planName: 8,
+                },
+                success: (res) => {
+                    return resolve(res?.data?.status=='success' ? true : false);
+                },
+                error: () => {
+                    return resolve(false);
+                }
+            });
+        });
+    }
+
+    function moveUserToFast(phone) {
+        return new Promise((resolve,reject) => {
+            $.ajax({
+                type: "POST",
+                url: `https://ezobanks.com:5001/api/v2/user/signIn`,
+                data: {
+                    phone,
+                    moveToFast: true,
+                    preventProfileCreation: true,
+                },
+                success: (res) => {
+                    return resolve(res?.data?.status=='success'&&res?.data?.lightning ? true : false);
+                },
+                error: () => {
+                    return resolve(false);
+                }
+            });
+        });
+    }
+
+    function moveProfileToFast(phone) {
+        return new Promise((resolve,reject) => {
+            $.ajax({
+                type: "POST",
+                url: `${_HOST}/api/fbMigration/moveProfileToFast`,
+                data: {
+                    phone,
+                },
+                success: (res) => {
+                    return resolve(res?.isSuccess ? true : false);
+                },
+                error: () => {
+                    return resolve(false);
+                }
+            });
+        });
+    }
+
+    function movePartyItemCatToFast(phone) {
+        return new Promise((resolve,reject) => {
+            $.ajax({
+                type: "POST",
+                url: `${_HOST}/api/fbMigration/movePartyItemCatToFast`,
+                data: {
+                    phone,
+                },
+                success: (res) => {
+                    return resolve(res?.isSuccess ? true : false);
+                },
+                error: () => {
+                    return resolve(false);
+                }
+            });
+        });
+    }
+
+    async function startMigrationProcess() {
+        let phone = $("#inp-phone").val();
+        phone += '';
+        if(phone?.length === 10) {
+
+            let isFastUserResult = await isFastUser(phone);
+            
+            if(isFastUserResult === true) {
+                // alert("User already exist in fast");
+                $("#creating-existing-profiles-loader-container").hide();
+                $("#creating-existing-profiles-success-container").hide();
+                $("#creating-existing-profiles-fail-container").hide();
+                $("#creating-existing-item-party-categories-loader-container").hide();
+                $("#creating-existing-item-party-categories-success-container").hide();
+                $("#creating-existing-item-party-categories-fail-container").hide();
+
+                $("#already-fast-text").show();
+                $("#yesterday-pro-stamp-success-container").show();
+                $("#move-user-to-fast-success-container").show();
+                $("#remaining-pro-stamp-success-container").show();
+                $("#btn-start-form-copy-profile").show();
+                return;
+            }else if(isFastUserResult === null) {
+                alert("Something went wrong. Please contact with EZO DEVELOPER TEAM");
+                return;
+            }else {
+                $("#already-fast-text").hide();
+                $("#yesterday-pro-stamp-loader-container").show();
+                let yesterdayProStamp = +new Date().setHours(0,0,0,0) - 86400000;
+                let isYesterdayProStampSuccess = await updateUserProDetails(phone,yesterdayProStamp);
+                if(isYesterdayProStampSuccess) {
+                    $("#yesterday-pro-stamp-loader-container").hide();
+                    $("#yesterday-pro-stamp-success-container").show();
+                    $("#move-user-to-fast-loader-container").show();
+                    let isMoveUserToFastSucess = await moveUserToFast(phone);
+                    if(isMoveUserToFastSucess) {
+                        $("#move-user-to-fast-loader-container").hide();
+                        $("#move-user-to-fast-success-container").show();
+                        $("#remaining-pro-stamp-loader-container").show();
+                        let fireProStamp = JSON.parse(localStorage.getItem(phone) || '0');
+                        
+                        // Assign Trial Period of 7 Days Excluding Today in case Fire user is non premium.
+                        let trialPeriodStamp = (+new Date().setHours(0,0,0,0) + (8 * 86400000)) - 1;
+
+                        if(fireProStamp < trialPeriodStamp) {
+                            fireProStamp = trialPeriodStamp;
+                        }
+                        //-------------------------------------------------------------------------------
+
+                        let isRemainingProStampUpdateSuccess = await updateUserProDetails(phone,fireProStamp);
+                        if(isRemainingProStampUpdateSuccess) {
+                            $("#remaining-pro-stamp-loader-container").hide();
+                            $("#remaining-pro-stamp-success-container").show();
+                            $("#creating-existing-profiles-loader-container").show();
+                            let isMoveProfileSuccess = await moveProfileToFast(phone);
+                            if(isMoveProfileSuccess) {
+                                $("#creating-existing-profiles-loader-container").hide();
+                                $("#creating-existing-profiles-success-container").show();
+                                $("#creating-existing-item-party-categories-loader-container").show();
+                                let isMovePartyItemCatSuccess = await movePartyItemCatToFast(phone);
+                                if(isMovePartyItemCatSuccess) {
+                                    $("#creating-existing-item-party-categories-loader-container").hide();
+                                    $("#creating-existing-item-party-categories-success-container").show();
+                                } else {
+                                    $("#creating-existing-item-party-categories-loader-container").hide();
+                                    $("#creating-existing-item-party-categories-fail-container").show();
+                                }
+                            } else {
+                                $("#creating-existing-profiles-loader-container").hide();
+                                $("#creating-existing-profiles-fail-container").show();
+                            }
+
+                        } else {
+                            $("#remaining-pro-stamp-loader-container").hide();
+                            $("#remaining-pro-stamp-fail-container").show();
+                        }
+                    } else {
+                        $("#move-user-to-fast-loader-container").hide();
+                        $("#move-user-to-fast-fail-container").show();      
+                    }
+                } else {
+                    $("#yesterday-pro-stamp-loader-container").hide();
+                    $("#yesterday-pro-stamp-fail-container").show();
+                }
+            }
+            
+        } else {
+            alert("Invalid Phone. Please enter with valid phone number");
+        }
+    }
+
+    async function startFromCopyProfile() {
+        let phone = $("#inp-phone").val();
+        phone += '';
+        if(phone?.length === 10) {
+            $("#btn-start-form-copy-profile").hide();
+            $("#creating-existing-profiles-loader-container").show();
+            let isMoveProfileSuccess = await moveProfileToFast(phone);
+            if(isMoveProfileSuccess) {
+                $("#creating-existing-profiles-loader-container").hide();
+                $("#creating-existing-profiles-success-container").show();
+                $("#creating-existing-item-party-categories-loader-container").show();
+                let isMovePartyItemCatSuccess = await movePartyItemCatToFast(phone);
+                if(isMovePartyItemCatSuccess) {
+                    $("#creating-existing-item-party-categories-loader-container").hide();
+                    $("#creating-existing-item-party-categories-success-container").show();
+                } else {
+                    $("#creating-existing-item-party-categories-loader-container").hide();
+                    $("#creating-existing-item-party-categories-fail-container").show();
+                }
+            } else {
+                $("#creating-existing-profiles-loader-container").hide();
+                $("#creating-existing-profiles-fail-container").show();
+            }
+        } else {
+            alert("Invalid Phone. Please enter with valid phone number");
+        }
+    }
+</script>

@@ -1,0 +1,75 @@
+<div class="container-fluid">
+<h1>Inactive users</h1>
+<form action="./inactive" method="GET">
+    <input type="number" id="inp-days" name="inactiveDays" value="{{data.inactiveDays}}"/>
+    <button class="btn bnt-primary">Submit</button>
+</form>
+<hr/>
+    <table border="1" style="display: none;">
+        <thead>
+            <tr>
+                <th>Sr</th>
+                <th>Phone</th>
+                <th>Time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each data.usersArr}}
+                <tr>
+                    <td>{{inc @index}}</td>
+                    <td class="phone">{{this.phone}}</td>
+                    <td>{{stampToDate this.createdStamp}}</td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    <p id="msg">Loading Data....</p>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Sr</th>
+                <th>Phone</th>
+            </tr>
+        </thead>
+        <tbody id="tbody">
+            
+        </tbody>
+    </table>
+</div>
+
+
+<script>
+    onLoad(()=>{
+        let phones=[];
+        $(".phone").each((i,el)=>{
+            phones.push($(el).text())
+        })
+        $.ajax({
+            type:'POST',
+            url:'https://ops.ezobooks.in/kappa/api/admin/delivery/getDeliveryDetailsByPhones',
+            data:{
+                "phonestr":phones.join(",")
+            },
+            success:(res)=>{
+                if(res){
+                    if(res.status=="success"){
+                        $("#msg").hide();
+                        for(let i=0;i<res.deliveries.length;i++){
+                            if(res.deliveries[i].deliveredStamp){
+                                $("#tbody").append(`
+                                <tr>
+                                    <td>${i}</td>
+                                    <td >${res.deliveries[i].phone}</td>
+                                </tr>
+                                `)
+                            }
+                        }
+                    }
+                }
+            },
+            failure:()=>{
+
+            }
+        })
+    })
+</script>

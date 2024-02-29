@@ -1,0 +1,157 @@
+<style>
+    #inp-phone {
+        padding: 5px;
+        text-align: center;
+    }
+
+    #select-profile {
+        width: 100%;
+        padding: 7px;
+        margin-left: 20px;
+    }
+
+    #btn-fetch-profile {
+        margin-left: 20px;
+    }
+
+    #btn-excel-upload {
+       display: none; 
+       width: 400px;
+       margin-top: 20px; 
+    }
+    #btn-excel-party-upload {
+       display: none; 
+       width: 400px;
+       margin-top: 20px; 
+    }
+
+    #btn-bulk-delete, #btn-bulk-item-category-delete {
+       display: none; 
+       width: 400px;
+       margin-top: 20px; 
+    }
+
+    #select-profile {
+        display: none;
+    }
+
+    .no-profiles {
+        display: none;
+        color: red;
+    }
+
+</style>
+
+<div class="container">
+    <div class="row" style="margin-top: 20%;">
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4" style="display: flex;">
+            <input id="inp-phone" placeholder="Phone" value="{{data.phone}}">
+            <select id="select-profile"></select>
+            <button class="btn btn-primary" type="button" id="btn-fetch-profile" onclick="fetchProfiles()">Fetch Profiles</button>
+        </div>
+        <div class="col-lg-4">
+            <span class="no-profiles">
+                There are no profiles available.
+            </span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-4"></div>
+        <div class="col-lg-4">
+            <button class="btn btn-primary" id="btn-excel-upload" type="button" onclick="excelUpload()">Upload Item Excel</button>
+            <button class="btn btn-primary" id="btn-excel-party-upload" type="button" onclick="excelPartyUpload()">Upload Party Excel</button>
+            <button class="btn btn-primary" id="btn-bulk-delete" type="button" onclick="bulkDelete()">Bulk Item Delete</button>
+            <button class="btn btn-primary" id="btn-bulk-item-category-delete" type="button" onclick="bulkItemCategoryDelete()">Bulk Item Category Delete</button>
+            
+        </div>
+        <div class="col-lg-4"></div>
+    </div>
+</div>
+
+
+<script>
+    onLoad(()=>{
+        let link=window.location.href;
+        if(link.indexOf("https://db.ezobooks.in/")!=-1){
+            link=link.replace(/https:\/\/db.ezobooks.in/g,'https://devdb.ezobooks.in');
+            window.location=link;
+        }
+    });
+    window.addEventListener("load", (event) => {
+        setTimeout(()=> {
+            fetchProfiles();
+        },1000);
+    });
+
+    function fetchProfiles() {
+        let phone = $("#inp-phone").val();
+        if(phone?.length === 10) {
+            $.ajax({
+                type: "POST",
+                url: `${_HOST}/api/unAuth/getAllProfiles`,
+                data: {
+                    phone,
+                },
+                success: (res) => {
+                    if(res?.records?.length) {
+                        let profiles = res?.records;
+                        $("#select-profile option").each(function() {
+                            $(this).remove();
+                        });
+                        profiles.forEach((profile,index)=>{
+                            $('#select-profile')
+                            .append($("<option></option>")
+                            .attr("value", profile?._localUUID)
+                            .text(profile?.profileName + ' | ' + profile?._localUUID)); 
+                        });
+                        $('#select-profile').css("display","block");
+                        $('#btn-excel-upload').css("display","block");
+                        $('#btn-excel-party-upload').css("display","block");
+                        $('#btn-bulk-delete').css("display","block");
+                        $('#btn-bulk-item-category-delete').css("display","block");
+                        $('#btn-fetch-profile').css("display","none");
+                    }else {
+                        $('.no-profiles').css("display","block");
+                    }
+                },
+                error: () => {}
+            });
+        }
+    }
+
+    function excelUpload() {
+        let phone = $("#inp-phone").val();
+        let profileId = $('#select-profile').val();
+        if(phone?.length === 10 && profileId) {
+            window.location.href = `${_HOST}/excel/upload?userId=${phone}&profileId=${profileId}`;
+        }
+    }
+
+    function excelPartyUpload() {
+        let phone = $("#inp-phone").val();
+        let profileId = $('#select-profile').val();
+        if(phone?.length === 10 && profileId) {
+            window.location.href = `${_HOST}/excel/partyUpload?userId=${phone}&profileId=${profileId}`;
+        }
+    }
+
+
+    function bulkDelete() {
+        let phone = $("#inp-phone").val();
+        let profileId = $('#select-profile').val();
+        if(phone?.length === 10 && profileId) {
+            window.location.href = `${_HOST}/bulk/list?userId=${phone}&profileId=${profileId}`;
+        }
+    }
+
+    function bulkItemCategoryDelete() {
+        let phone = $("#inp-phone").val();
+        let profileId = $('#select-profile').val();
+        if(phone?.length === 10 && profileId) {
+            window.location.href = `${_HOST}/bulk/listItemCategories?userId=${phone}&profileId=${profileId}`;
+        }
+    }
+
+
+</script>

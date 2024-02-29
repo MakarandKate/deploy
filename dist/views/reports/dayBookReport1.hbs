@@ -1,0 +1,163 @@
+<style>
+    .container-chart {
+        margin-top: 50px;
+        text-align: center;
+    }
+
+    .container-rows {
+        margin-top: 25px;
+        margin-bottom: 500px;
+        text-align: center;
+    }
+
+    .section-left, .section-right {
+        display: inline-block;
+        width: 300px;
+        padding: 5px 20px;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .header {
+        background-color: #D8D8D8;
+        padding: 5px 10px !important;
+        font-size: 15px !important;
+    }
+
+    .section-left {
+        text-align: left;
+    }
+
+    .section-right {
+        text-align: right;
+    }
+
+    .success {
+        color: #228B22;
+    }
+
+    .danger {
+        color: #FF3131;
+    }
+
+    .record-row {
+        display: inline-block;
+        width: 600px;
+        border: 1px solid #D8D8D8;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 10px 20px;
+        margin-bottom: 10px;
+        border-radius: 15px;
+    }
+
+    .float-left {
+        float: left;
+    }
+
+    .float-right {
+        float: right;
+    }
+
+    .light-color {
+        color: #909090;
+    }
+
+</style>
+<div class="container-chart">
+    <div class="section-left header">
+        Particulars
+    </div>
+
+    <div class="section-right header">
+        Amount
+    </div>
+
+    <br>
+    <div class="section-left">
+        Sale
+    </div>
+
+    <div class="section-right">
+        &#8377; {{data.dayBookReportData.totalSalesAmount}}
+    </div>
+    
+    <br>
+    <div class="section-left">
+        Purchase
+    </div>
+
+    <div class="section-right">
+        &#8377; {{data.dayBookReportData.totalPurchasesAmount}}
+    </div>
+
+    <br>
+    <div class="section-left">
+        Money In
+    </div>
+
+    <div class="section-right success">
+        &#8377; {{data.dayBookReportData.totalMoneyInsAmount}}
+    </div>
+
+    <br>
+    <div class="section-left">
+        Money Out
+    </div>
+
+    <div class="section-right danger">
+        &#8377; {{data.dayBookReportData.totalMoneyOutsAmount}}
+    </div>
+
+    <br>
+    <div class="section-left">
+        Cash In Hand
+    </div>
+
+    <div class="section-right {{isSuccessDanger data.dayBookReportData.totalCashInHandAmount}}">
+        &#8377; {{data.dayBookReportData.totalCashInHandAmount}}
+    </div>
+
+    <br>
+    <div class="section-left">
+        UPI Amount
+    </div>
+
+    <div class="section-right {{isSuccessDanger data.dayBookReportData.totalUPIAmount}}"">
+        &#8377; {{data.dayBookReportData.totalUPIAmount}}
+    </div>
+
+    <br>
+    <div class="section-left">
+        Cheque Amount
+    </div>
+
+    <div class="section-right {{isSuccessDanger data.dayBookReportData.totalChequeAmount}}"">
+        &#8377; {{data.dayBookReportData.totalChequeAmount}}
+    </div>
+
+    <br>
+    <div class="section-left">
+        Cash Amount
+    </div>
+
+    <div class="section-right {{isSuccessDanger data.dayBookReportData.totalCashAmount}}">
+        &#8377; {{data.dayBookReportData.totalCashAmount}}
+    </div>
+
+</div>
+
+{{#if data.dayBookReportData.records.length}}
+    <div class="container-rows">
+        {{#each data.dayBookReportData.records}}
+            <div class="record-row">
+                <span class="float-left">{{ this.txnType }}</span>
+                <span class="float-right">&#8377; {{ this.record.totalAmount }}</span>
+                <br>
+                <span class="float-left light-color">{{ dateToDDMMYYY this.record.billDateStamp }}</span>
+                <span class="float-right light-color">{{ this.record.billNo }}</span>
+            </div>
+            <br>
+        {{/each}}
+    </div>
+{{/if}}

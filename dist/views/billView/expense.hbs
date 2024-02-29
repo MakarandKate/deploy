@@ -1,0 +1,32 @@
+<style>
+    .no-print{
+        display: none;
+    }
+    @media print{
+
+        .print-none{
+            display: none;
+        }
+    }
+</style>
+<div class="container-fluid">
+<div class="row print-none" style="margin-top: 40px;">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-2"></div>
+    <div class="col-sm-2"></div>
+    <div class="col-sm-2"></div>
+    <div class="col-sm-2"></div>
+    <div class="col-sm-2">
+        <button class="btn btn-primary" onclick="download()">Download</button>
+    </div>
+</div>
+{{{data.html}}}
+</div>
+<script>
+    function download(){
+        let link=window.location.href;
+        let a=document.createElement('a');
+        a.href=`https://pdf.ezobooks.in/bill_{{data.billNo}}?url=${link}`;
+        a.click();
+    }
+</script>

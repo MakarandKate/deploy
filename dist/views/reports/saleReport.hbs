@@ -1,0 +1,197 @@
+<style>
+    h5 {
+        font-size: 22px;
+    }
+
+    .header-wrapper {
+        border-radius: 3px;
+        background: linear-gradient(66deg, #311b92, #3618b8, #5332e3);
+        margin: auto;
+        border: 1px solid rgb(20, 20, 19);
+        padding: 3px;
+        text-align: center;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .center1 {
+        border-radius: 10px;
+        background: #faf9ff;
+        margin: auto;
+        width: 90%;
+        border: 1px solid rgb(181, 179, 191);
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .margin-bottom10 {
+        margin-bottom: 10px;
+    }
+
+    p {
+        margin: 0 0 0px;
+        font-size: 16px;
+    }
+
+    .date {
+        font-size: 12px;
+    }
+
+    .btn {
+        margin-bottom: 5px;
+        width: 256px;
+    }
+
+    .closebtn {
+        margin-left: 15px;
+        color: #46763d;
+        font-weight: bold;
+        float: right;
+        font-size: 22px;
+        line-height: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .alert {
+        transition: 0.5s ease-out;
+        position: fixed;
+        width: 85%;
+        bottom: 50px;
+        color: green;
+        background: #f9fff2;
+    }
+
+    .snackbar-holder {
+        position: fixed;
+        bottom: -300px;
+        left: 0px;
+        min-height: 30px;
+        max-height: 100px;
+        z-index: 99999;
+        width: 100%;
+        padding: 20px;
+        opacity: 0;
+        transition: 0s all linear;
+        color: #46763d;
+    }
+
+    .report-font-weight {
+        font-weight: 700;
+    }
+
+    .font-size20 {
+        font-size: 20px;
+    }
+
+    .font-size18 {
+        font-size: 18px;
+    }
+
+
+    .main-table {
+        font-family: Arial, Helvetica, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .main-table td,
+    .main-table th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    .main-table tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    .main-table tr:hover {
+        background-color: #F5F5F5;
+    }
+
+    .main-table th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: #3E80ED;
+        color: white;
+    }
+</style>
+
+<div class="container">
+    <p class="margin-bottom10 font-size20">
+        <img src="{{data.profile.logoLink}}" width="80" height="80" style="border-radius: 50%;">
+        {{data.profile.legalName}}
+    </p>
+
+    <p class="header-wrapper margin-bottom10">Sale Report</p>
+
+    <div class="center1">
+        <p>Duration : {{ data.saleReportData.duration }}</p><br>
+        <p>Total Sales : {{ data.saleReportData.sales.length }}</p>
+        <p>Total Sale Quantity : {{ data.saleReportData.totalSalesQuantity }}</p>
+        <p>Total Sale Amount :  &#8377; {{ data.saleReportData.totalSalesAmount }}</p>
+    </div>
+
+    <div class="container">
+        <h1>Sale Report</h1>
+
+        <table class="main-table" width="100%">
+            <thead>
+                <tr>
+                    <th>Sr No</th>
+                    <th>Date</th>
+                    <th>TXN No</th>
+                    <th>Party Name</th>
+                    <th>Total Quantity</th>
+                    <th>Total Tax</th>
+                    <th>Total Amount<br> ( inc taxes )</th>
+                    <th>Created By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each data.saleReportData.sales}}
+                    <tr>
+                        <td>{{ inc @index }}</td>
+                        <td>{{ dateToDDMMYYY this.sale.billDateStamp }}</td>
+                        <td>{{ this.sale.billNo }}</td>
+                        <td>{{ this.sale.party.name }}</td>
+                        <td>{{ this.totalBillItemQuantity }}</td>
+                        <td>&#8377; {{ this.totalTax }}</td>
+                        <td>&#8377; {{ this.sale.totalAmount }}</td>
+                        <td>Admin</td>
+                    </tr>
+                    {{#if this.sale.billItems.length}}
+                        <tr *ngIf="record?.sale?.billItems?.length">
+                            <td width="10%"></td>
+                            <td width="90%" colspan="7">
+                                <table class="sub-table" width="100%">
+                                    <thead>
+                                        <th>#</th>
+                                        <th>Item Name</th>
+                                        <th>Qty</th>
+                                        <th>Unit</th>
+                                        <th>Rs/Unit</th>
+                                        <th>Amount</th>
+                                    </thead>
+                                    <tbody>
+                                        {{#each this.sale.billItems}}
+                                            <tr>
+                                                <td>{{ inc @index }}</td>
+                                                <td>{{ this.item.itemName }}</td>
+                                                <td>{{ this.quantity }}</td>
+                                                <td>{{ this.unit }}</td>
+                                                <td>&#8377; {{ this.price }}</td>
+                                                <td>&#8377; {{ this.total }}</td>
+                                            </tr>
+                                        {{/each}}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    {{/if}}
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>

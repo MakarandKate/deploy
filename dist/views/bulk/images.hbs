@@ -1,0 +1,117 @@
+<input type="hidden" id="inp-userId" value="{{data.userId}}"/>
+<input type="hidden" id="inp-profileId" value="{{data.profileId}}"/>
+<style>
+    .td-img img{
+        width:150px;
+        
+    }
+    .td-img{
+        padding:5px;
+        
+    }
+    .td-img img.active{
+        border:5px solid rgb(28, 126, 232);
+    }
+    .sp-view{
+        text-decoration: underline;
+        color: rgba(25, 90, 210, 0.807);
+        cursor: pointer;
+    }
+    tr.collapsed{
+        display: none;
+    }
+</style>
+<div class="container">
+    <h1>Bulk Images</h1>
+    <hr/>
+    <p id="p-status"></p>
+    <button id="btn-upload" class="btn btn-primary">Upload</button>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Sr</th>
+                <th colspan="5">Item Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each data.items}}
+            <tr>
+                <td>
+                    {{inc @index}}
+                </td>
+                <td colspan="3" class="td-name" data-id="{{this._localUUID}}">{{this.itemName}}</td>
+                <td class="td-img td-img1" data-id="{{this._localUUID}}"></td>
+                <td><span class="sp-view" data-id="{{this._localUUID}}">View More</span></td>
+            </tr>
+            <tr class="collapsed" data-id="{{this._localUUID}}">
+                <td></td>
+                <td class="td-img td-img2" data-id="{{this._localUUID}}"></td>
+                <td class="td-img td-img3" data-id="{{this._localUUID}}"></td>
+                <td class="td-img td-img4" data-id="{{this._localUUID}}"></td>
+                <td class="td-img td-img5" data-id="{{this._localUUID}}"></td>
+                <td class="td-img td-img6" data-id="{{this._localUUID}}"></td>
+            </tr>
+            <tr class="collapsed" data-id="{{this._localUUID}}">
+                <td></td>
+                <td class="td-img td-img7" data-id="{{this._localUUID}}"></td>
+                <td class="td-img td-img8" data-id="{{this._localUUID}}"></td>
+                <td class="td-img td-img9" data-id="{{this._localUUID}}"></td>
+                <td class="td-img td-img10" data-id="{{this._localUUID}}"></td>
+                <td class="td-img td-img11" data-id="{{this._localUUID}}"></td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+</div>
+
+<script>
+    onLoad(()=>{
+        $(".sp-view").on('click',(ev)=>{
+            $(`tr[data-id="${$(ev.target).attr('data-id')}"]`).removeClass("collapsed")
+        });
+        $("#btn-upload").on('click',()=>{
+            initUpload();
+        });
+    })
+
+    async function initUpload(){
+        let itemImages=[];
+        $("img.active").each((i,el)=>{
+            itemImages.push({
+                itemId:$(el).parent().attr('data-id'),
+                base64:$(el).attr('src').replace('data:image/jpeg;base64,','').replace('data:image/png;base64,','')
+            })
+        })
+        for(let i=0;i<itemImages.length;i++){
+            let isUploaded=await uploadImage(itemImages[i].itemId,itemImages[i].base64)
+            $("#p-status").text(`Uploading ${i+1}/${itemImages.length}`)
+        }
+        alert('Upload Complete');
+    }
+
+    async function uploadImage(itemId,base64){
+        return new Promise((resolve,reject)=>{
+            $.ajax({
+                type:'POST',
+                url:`${_HOST}/bulk/uploadImage`,
+                data:{
+                    userId:$("#inp-userId").val(),
+                    profileId:$("#inp-profileId").val(),
+                    itemId,
+                    base64
+                },
+                success:(res)=>{
+                    if(res.status=="success"){
+                        resolve(true);
+                    }else{
+                        resolve(false);
+                    }
+                },
+                error:()=>{
+                    resolve(false);
+                }
+            })
+        })
+    }
+</script>

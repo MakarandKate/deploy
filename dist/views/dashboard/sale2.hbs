@@ -1,0 +1,193 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<div class="container-fluid">
+    
+<h1>Sale</h1>
+<hr/>
+<div class="row">
+    <div class="col-sm-6">
+        <h3>Total Sale Today: {{data.todayCount}}</h3>
+        <h3>Total Sale TillDate: {{data.totalCount}}</h3>
+    </div>
+    <div class="col-sm-6">
+        <h3>Current Active Users: {{data.currentActiveUsersCount}}</h3>
+        <h3>Total Registration Today : {{data.totalRegistrationDay0}}</h3>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6">
+        <div id="chart_div0"></div>
+        <div id="chart_div1"></div>
+        <div id="chart_div2"></div>
+    </div>
+    <div class="col-sm-6">
+        <div id="registration_chart"></div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-6">
+        <div id="map_div"></div>
+    </div>
+    <div class="col-sm-6">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>Top Users</h3>
+                
+            </div>
+            <div class="col-sm-4">
+                <h5>All Time</h5>
+                <hr/>
+                <ol>
+                    {{#each data.topUsersAllTime}}
+                        <li>
+                            {{this._id.userId}} ({{this.count}})
+                        </li>
+                    {{/each}}
+                </ol>
+            </div>
+            <div class="col-sm-4">
+                <h5>Today</h5>
+                <hr/>
+                <ol>
+                    {{#each data.topUsersToday}}
+                        <li>
+                            {{this._id.userId}} ({{this.count}})
+                        </li>
+                    {{/each}}
+                </ol>
+            </div>
+            <div class="col-sm-4">
+                <h5>Last Hour</h5>
+                <hr/>
+                <ol>
+                    {{#each data.topUsersLastHour}}
+                        <li>
+                            {{this._id.userId}} ({{this.count}})
+                        </li>
+                    {{/each}}
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+    onLoad(()=>{
+        google.charts.load('current', {
+            'packages':['corechart','geochart'],
+            'mapsApiKey':'AIzaSyDS3O3U7T0G8uhfy2n4hx3hgRk23rDcfkI'
+        });
+        google.charts.setOnLoadCallback(drawChart);
+    })
+
+    function drawChart() {
+
+        // Create the data table.
+        var data = new google.visualization.arrayToDataTable({{{data.graph2}}});
+
+        // Set chart options
+        var options = {
+        title: 'Total Sale hourwise',
+        hAxis: {
+          title: 'Hour',
+
+        },
+        vAxis: {
+          title: 'Sales Count'
+        }
+      };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div2'));
+        chart.draw(data, options);
+        drawChart1();
+    }
+
+    function drawChart1() {
+
+        // Create the data table.
+        var data = new google.visualization.arrayToDataTable({{{data.graph1}}});
+
+        // Set chart options
+        var options = {
+        title: 'Total Sale hourwise',
+        hAxis: {
+          title: 'Hour',
+
+        },
+        vAxis: {
+          title: 'Sales Count'
+        }
+      };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div1'));
+        chart.draw(data, options);
+        drawChart0();
+    }
+
+    function drawChart0() {
+
+        // Create the data table.
+        var data = new google.visualization.arrayToDataTable({{{data.graph0}}});
+
+        // Set chart options
+        var options = {
+        title: 'Total Sale hourwise',
+        hAxis: {
+          title: 'Hour',
+
+        },
+        vAxis: {
+          title: 'Sales Count'
+        }
+      };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.ColumnChart(document.getElementById('chart_div0'));
+        chart.draw(data, options);
+        drawMap();
+    }
+
+ 
+    
+    function drawMap () {
+      var data = new google.visualization.arrayToDataTable({{{data.mapPins}}});
+
+      var url = 'http://localhost:4150/kappa/img/';
+
+      var options = {
+        region: 'IN',
+        displayMode: 'markers',
+        colorAxis: {colors: ['blue']}
+      };
+
+      var mapChart = new google.visualization.GeoChart(document.getElementById('map_div'));
+      mapChart.draw(data, options);
+      drawRegistrationChart();
+    }
+
+    function drawRegistrationChart() {
+
+        // Create the data table.
+        var data = new google.visualization.arrayToDataTable([
+            ['Days', 'Count'],
+            ['Day6',{{data.totalRegistrationDay6}}],
+            ['Day5',{{data.totalRegistrationDay5}}],
+            ['Day4',{{data.totalRegistrationDay4}}],
+            ['Day3',{{data.totalRegistrationDay3}}],
+            ['Day2',{{data.totalRegistrationDay2}}],
+            ['Day1',{{data.totalRegistrationDay1}}],
+            ['Day0',{{data.totalRegistrationDay0}}],
+        ]);
+
+        // Set chart options
+        var options = {
+          title: 'Registration',
+          legend: { position: 'bottom' }
+        };
+
+        // Instantiate and draw our chart, passing in some options.
+        var chart = new google.visualization.LineChart(document.getElementById('registration_chart'));
+        chart.draw(data, options);
+      }
+</script>
